@@ -1,6 +1,5 @@
 plugins {
   kotlin("jvm") version "2.0.21"
-  kotlin("plugin.serialization") version "2.0.21"
   id("java")
   id("maven-publish")
 }
@@ -9,6 +8,9 @@ group = "harmony.library"
 version = "1.0-SNAPSHOT"
 
 repositories {
+  maven("https://oss.sonatype.org/content/repositories/snapshots")
+  maven("https://oss.sonatype.org/content/repositories/central")
+  maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
   mavenLocal()
   mavenCentral()
 }
