@@ -36,6 +36,7 @@ fun findInstructor(name: String): Instructor? {
  * It associates the command with its label, making it available for use.
  */
 fun Command.register() {
+  Bukkit.getServer()
   commandMap.register(label, this)
 }
 

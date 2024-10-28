@@ -8,15 +8,13 @@ group = "harmony.library"
 version = "1.0-SNAPSHOT"
 
 repositories {
-  maven("https://oss.sonatype.org/content/repositories/snapshots")
-  maven("https://oss.sonatype.org/content/repositories/central")
-  maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-  mavenLocal()
+ // mavenLocal()
   mavenCentral()
 }
 
 dependencies {
-  compileOnly("org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT")
+  //compileOnly("org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT") - jitpack not support local repositories...
+  compileOnly(fileTree("libs"))
   compileOnly("it.unimi.dsi:fastutil:8.5.13")
 }
 
