@@ -231,3 +231,6 @@ Command("broadcast", sender = Sender.ALL, permission = "harmony.broadcast") {
   Bukkit.broadcastMessage(joinNotEmpty("Specify the message to broadcast"))
 }
 ```
+
+## Current limitations:
+A unique limitation of this framework, is that is not much customizable for messages. This will be implemented later in future versions.
