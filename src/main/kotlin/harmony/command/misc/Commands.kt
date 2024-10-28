@@ -14,7 +14,8 @@ val commandMap: SimpleCommandMap get() = (Bukkit.getServer() as CraftServer).com
  * @return The [Command] if found, or `null` if no command with the given name exists.
  */
 fun findCommand(name: String): Command? {
-  return commandMap.commands.find { it.name == name }
+  return commandMap.getCommand(name)
+  //return commandMap.commands.find { it.name == name }
 }
 
 /**
@@ -36,7 +37,6 @@ fun findInstructor(name: String): Instructor? {
  * It associates the command with its label, making it available for use.
  */
 fun Command.register() {
-  Bukkit.getServer()
   commandMap.register(label, this)
 }
 

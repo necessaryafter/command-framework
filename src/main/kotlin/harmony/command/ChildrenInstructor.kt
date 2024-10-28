@@ -1,5 +1,7 @@
 package harmony.command
 
+import net.md_5.bungee.api.chat.*
+
 /**
  * Represents a child command that extends the functionality of a parent [Instructor] command.
  *
@@ -15,7 +17,7 @@ package harmony.command
  * @param parent The parent command of this child.
  * @param name The name of this child command.
  */
-class ChildrenInstructor(var parent: Instructor, name: String) : Instructor(name) {
+open class ChildrenInstructor(val parent: Instructor, name: String) : Instructor(name) {
   
   /**
    * Whether this child command should be displayed in help listings.
@@ -61,5 +63,34 @@ class ChildrenInstructor(var parent: Instructor, name: String) : Instructor(name
       }
       insert(0, "${parent.name} ")
     }.trim()
+  }
+  
+  /**
+   * Gets the [TextComponent] representation of this command's help information.
+   *
+   * @param isEnd Whether this command is the last command in the command hierarchy.
+   * @return The [TextComponent] representation of the command's help information.
+   */
+  open fun getInformationalHelp(isEnd: Boolean): TextComponent {
+    return TextComponent(" §b§l${if (isEnd) "┗" else "┃"} §f${fullUsage}").apply {
+      clickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/${fullyName}")
+      hoverEvent = HoverEvent(
+        HoverEvent.Action.SHOW_TEXT,
+        arrayOf(
+          TextComponent(
+            """
+            §fAliases: §7${if (aliases.isEmpty()) "Nenhum" else aliases.joinToString(", ", limit = 5)}
+            §fPermissão: §7${permission ?: "Nenhuma"}
+            §fAplicado para: §7${sender.display}
+            §fUso: §7${usageArguments}
+            §fMáximo de argumentos: §7${if (maxArgs < 0) "∞" else maxArgs}
+            §fSub-comandos: §7${childrens.size}
+            
+            §bClique para sugerir.
+            """.trimIndent()
+          )
+        )
+      )
+    }
   }
 }

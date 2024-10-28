@@ -1,7 +1,6 @@
 package harmony.command
 
 import it.unimi.dsi.fastutil.objects.*
-import net.md_5.bungee.api.chat.*
 import org.bukkit.*
 import org.bukkit.command.*
 import org.bukkit.entity.*
@@ -129,8 +128,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     if (childrens.isNotEmpty() && firstArg != null) {
       val child = findChildren(firstArg)
       if (child != null) {
-        child.execute(sender, "$name $firstArg", args.copyOfRange(1, args.size))
-        return true
+        return child.execute(sender, "$name $firstArg", args.copyOfRange(1, args.size))
       }
     }
     
@@ -150,7 +148,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     }
     
     if (!this::executor.isInitialized || isHelpArg(firstArg) && childrens.isNotEmpty()) {
-      if (sender.hasPermission("harmony.admin")) {
+      if (sender.hasPermission(permission)) {
         if (sender is Player) {
           sendHelpToPlayer(sender)
         } else {
@@ -173,7 +171,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     } catch (e: Exception) {
       if (sender.isOp && sender !is ConsoleCommandSender) {
         sender.sendMessage("§cUm erro inesperado ocorreu: '${e.message}'")
-        sender.sendMessage(e.stackTraceToString())
+        //sender.sendMessage(e.stackTraceToString())
       } else {
         sender.sendMessage("§cUm erro inesperado ocorreu. Contate um Administrador.")
       }
@@ -237,27 +235,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     childrens.forEachIndexed { index, child ->
       if (child.showInHelp) {
         if (child.extraInfo) {
-          val component = TextComponent(" §b§l${if (index == childrens.size - 1) "┗" else "┃"} §f${child.fullUsage}").apply {
-            clickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/${child.fullyName}")
-            hoverEvent = HoverEvent(
-              HoverEvent.Action.SHOW_TEXT,
-              arrayOf(
-                TextComponent(
-                  """
-                  §fAliases: §7${if (child.aliases.isEmpty()) "Nenhum" else child.aliases.joinToString(", ", limit = 5)}
-                  §fPermissão: §7${child.permission ?: "Nenhuma"}
-                  §fAplicado para: §7${child.sender.display}
-                  §fUso: §7${child.usageArguments}
-                  §fMáximo de argumentos: §7${if (child.maxArgs < 0) "∞" else child.maxArgs}
-                  §fSub-comandos: §7${child.childrens.size}
-                  
-                  §bClique para sugerir.
-                  """.trimIndent()
-                )
-              )
-            )
-          }
-          player.spigot().sendMessage(component)
+          player.spigot().sendMessage(child.getInformationalHelp(index == childrens.size - 1))
         } else {
           player.sendMessage(" §b§l${if (index == childrens.size - 1) "┗" else "┃"} §f/${child.fullUsage}")
         }
