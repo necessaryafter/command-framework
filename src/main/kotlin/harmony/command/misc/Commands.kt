@@ -106,3 +106,13 @@ fun tabComplete(lastWord: String, possibilities: Iterable<String>): MutableList<
     .sortWith(String.CASE_INSENSITIVE_ORDER)
   return result
 }
+
+
+fun main() {
+  
+  Command("broadcast", sender = Sender.ALL, permission = "harmony.broadcast") {
+    // join all arguments into a single string. If arguments are empty, fail with the given message.
+    Bukkit.broadcastMessage(joinNotEmpty("Specify the message to broadcast"))
+  }
+  
+}

@@ -1,6 +1,7 @@
 package harmony.command
 
 import it.unimi.dsi.fastutil.objects.*
+import kotlinx.coroutines.*
 import org.bukkit.*
 import org.bukkit.command.*
 import org.bukkit.entity.*
@@ -47,6 +48,11 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
    * for them while executing the command.
    */
   override var childrensLookup: MutableMap<String, ChildrenInstructor> = Object2ObjectOpenHashMap(8)
+  
+  /**
+   * Indicates if this instructable is asynchronous.
+   */
+  override var isAsync = false
   
   /**
    * The maximum number of arguments that can be passed to this instructable.
@@ -161,7 +167,14 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     }
     
     try {
-      executor(this.sender.createExecutor(sender, this, args))
+      val action = this.sender.createExecutor(sender, this, args)
+      if (isAsync) {
+        CommandScope.launch {
+          executor.invoke(action)
+        }
+      } else {
+        executor.invoke(action)
+      }
       return true
     } catch (e: InstructorStop) {
       return false

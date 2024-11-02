@@ -20,10 +20,12 @@ internal fun internalBuildInstructor(
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ) = Instructor(name.split('|')).apply {
   this.sender = sender
   this.maxArgs = max
+  isAsync = async
   if (permission != null) this.permission = permission
   fullyName = name
   if (usage != null) {
@@ -51,6 +53,7 @@ internal fun internalBuildInstructor(
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ) = internalBuildInstructor(
   name,
@@ -58,6 +61,7 @@ internal fun internalBuildInstructor(
   permission = permission,
   usage = usage,
   max = max,
+  async = async,
   action = action
 )
 
@@ -85,6 +89,7 @@ internal fun internalBuildChildrenInstructor(
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ) = ChildrenInstructor(parent, name.split('|')).apply {
   this.sender = sender
@@ -99,6 +104,7 @@ internal fun internalBuildChildrenInstructor(
     this.usage = parent.usage
   }
   this.maxArgs = max
+  isAsync = async
   action(this)
 }
 
@@ -126,6 +132,7 @@ internal fun internalBuildChildrenInstructor(
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ) = internalBuildChildrenInstructor(
   parent,
@@ -136,6 +143,7 @@ internal fun internalBuildChildrenInstructor(
   max = max,
   showHelp = showHelp,
   extraInfo = extraInfo,
+  async = async,
   action = action
 )
 
@@ -161,6 +169,7 @@ internal fun Instructor.internalAppendChildren(
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ): ChildrenInstructor {
   val children = internalBuildChildrenInstructor(
@@ -172,6 +181,7 @@ internal fun Instructor.internalAppendChildren(
     max = max,
     showHelp = showHelp,
     extraInfo = extraInfo,
+    async = async,
     action = action
   )
   
@@ -201,6 +211,7 @@ fun Instructor.internalAppendChildren(
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ): ChildrenInstructor {
   val children = internalBuildChildrenInstructor(
@@ -212,6 +223,7 @@ fun Instructor.internalAppendChildren(
     max = max,
     showHelp = showHelp,
     extraInfo = extraInfo,
+    async = async,
     action = action
   )
   addChildren(children)
@@ -236,10 +248,11 @@ fun ComplexCommand(
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ): Instructor {
   val command =
-    internalBuildInstructor(name, sender = sender, permission = permission, usage = usage, max = max, action = action)
+    internalBuildInstructor(name, sender = sender, permission = permission, usage = usage, max = max, async = async, action = action)
   command.register()
   return command
 }
@@ -262,6 +275,7 @@ fun ComplexCommand(
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ): Instructor {
   val command = internalBuildInstructor(
@@ -270,6 +284,7 @@ fun ComplexCommand(
     permission = permission,
     usage = usage,
     max = max,
+    async = async,
     action = action
   )
   command.register()
@@ -294,9 +309,10 @@ fun Command(
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
+  async: Boolean = false,
   action: Argumentable.() -> Unit,
 ): Instructor {
-  val command = internalBuildInstructor(name, sender = sender, permission = permission, usage = usage, max = max) {
+  val command = internalBuildInstructor(name, sender = sender, permission = permission, usage = usage, max = max, async = async) {
     performs(action)
   }
   
@@ -322,9 +338,10 @@ fun Command(
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
+  async: Boolean = false,
   action: Argumentable.() -> Unit,
 ): Instructor {
-  val command = internalBuildInstructor(name, onlyPlayers = onlyPlayers, permission = permission, usage = usage, max = max) {
+  val command = internalBuildInstructor(name, onlyPlayers = onlyPlayers, permission = permission, usage = usage, max = max, async = async) {
     performs(action)
   }
   
@@ -357,6 +374,7 @@ fun Instructor.complex(
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
@@ -366,6 +384,7 @@ fun Instructor.complex(
   max = max,
   showHelp = showHelp,
   extraInfo = extraInfo,
+  async = async,
   action = action
 )
 
@@ -394,6 +413,7 @@ fun Instructor.complex(
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
+  async: Boolean = false,
   action: Instructor.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
@@ -403,6 +423,7 @@ fun Instructor.complex(
   max = max,
   showHelp = showHelp,
   extraInfo = extraInfo,
+  async = async,
   action = action
 )
 
@@ -430,6 +451,7 @@ fun Instructor.sub(
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
+  async: Boolean = false,
   action: Argumentable.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
@@ -438,7 +460,8 @@ fun Instructor.sub(
   usage = usage,
   max = max,
   showHelp = showHelp,
-  extraInfo = extraInfo
+  extraInfo = extraInfo,
+  async = async
 ) {
   performs(action)
 }
@@ -468,6 +491,7 @@ fun Instructor.sub(
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
+  async: Boolean = false,
   action: Argumentable.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
@@ -477,6 +501,7 @@ fun Instructor.sub(
   max = max,
   showHelp = showHelp,
   extraInfo = extraInfo,
+  async = async
 ) {
   performs(action)
 }

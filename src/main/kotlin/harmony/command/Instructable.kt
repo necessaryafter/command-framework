@@ -56,6 +56,16 @@ interface Instructable {
   var childrensLookup: MutableMap<String, ChildrenInstructor>
   
   /**
+   * If this instructable is asynchronous.
+   *
+   * This property indicates whether the instructable command is asynchronous or synchronous.
+   * Defaults to false.
+   *
+   * @return `true` if the instructable command is asynchronous, `false` otherwise.
+   */
+  var isAsync: Boolean
+  
+  /**
    * The maximum number of arguments that can be passed to this instructable.
    *
    * Defines the maximum number of arguments that the instructable command can accept.
