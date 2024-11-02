@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.github.networkharmony:command-framework:1.0.5")
+  implementation("com.github.networkharmony:command-framework:1.0.6")
 }
 ```
 
@@ -30,12 +30,13 @@ Here a simple example, where we automatically register a command to be used in t
 Here, we allow only players to execute the command by `sender`, with a permission of ``"harmony.example"``, a simple usage and a max arguments possible by `1`.
 
 ```kt
-Command("example|examples", sender = Sender.PLAYER, permission = "harmony.example", usage = "<some-arg>", max = 1) {
+Command("example|examples", sender = Sender.PLAYER, permission = "harmony.example", usage = "<some-arg>", max = 1, async = true) {
   msg("§aHello, ${player.name}!")
 }
 ```
 
 #### The `usage` parameter is only for arguments legibility, not a descriptive reason of what the command do.
+#### The `async` parameter is for executing the command in asynchronous instead of the main thread. All commands builders support this
 
 ### Complex command example:
 Complex command follows the same structure as simple command:
