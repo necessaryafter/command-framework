@@ -1,9 +1,11 @@
 package harmony.command.misc
 
 import harmony.command.*
+import it.unimi.dsi.fastutil.objects.*
 import org.bukkit.*
 import org.bukkit.command.*
 import org.bukkit.craftbukkit.v1_8_R3.*
+import org.bukkit.util.*
 
 val commandMap: SimpleCommandMap get() = (Bukkit.getServer() as CraftServer).commandMap
 
@@ -97,22 +99,52 @@ fun unregisterCommands(commands: Iterable<String>) {
  *
  * @param lastWord The last word typed by the player for which suggestions are being generated.
  * @param possibilities A list of possible completions to be filtered and sorted.
+ * @param sort Whether to sort the suggestions alphabetically.
  * @return A mutable list of sorted, case-insensitive suggestions that match the last word.
  */
-fun tabComplete(lastWord: String, possibilities: Iterable<String>): MutableList<String> {
-  val result = ArrayList<String>()
-  possibilities
-    .filterTo(result) { it.startsWith(lastWord, ignoreCase = true) }
-    .sortWith(String.CASE_INSENSITIVE_ORDER)
+fun tabComplete(lastWord: String, possibilities: Iterable<String>, sort: Boolean = true): List<String> {
+  val result = ObjectArrayList<String>()
+  possibilities.filterTo(result) { StringUtil.startsWithIgnoreCase(it, lastWord) }
+  if (sort) {
+    result.sortWith(String.CASE_INSENSITIVE_ORDER)
+  }
+  return result
+}
+
+/**
+ * Provides tab-completion suggestions based on the last word typed.
+ *
+ * This function compares the given [lastWord] with a set of possible completions,
+ * returning a sorted list of suggestions that start with the same characters.
+ *
+ * @param lastWord The last word typed by the player for which suggestions are being generated.
+ * @param possibilities A list of possible completions to be filtered and sorted.
+ * @param sort Whether to sort the suggestions alphabetically.
+ * @return A mutable list of sorted, case-insensitive suggestions that match the last word.
+ */
+fun tabComplete(lastWord: String, possibilities: Array<out String>, sort: Boolean = true): List<String> {
+  val result = ObjectArrayList<String>()
+  possibilities.filterTo(result) {it.startsWith(lastWord, ignoreCase = true) }
+  if (sort) {
+    result.sortWith(String.CASE_INSENSITIVE_ORDER)
+  }
   return result
 }
 
 
-fun main() {
-  
-  Command("broadcast", sender = Sender.ALL, permission = "harmony.broadcast") {
-    // join all arguments into a single string. If arguments are empty, fail with the given message.
-    Bukkit.broadcastMessage(joinNotEmpty("Specify the message to broadcast"))
-  }
-  
+/**
+ * Provides tab-completion suggestions based on the last word typed.
+ *
+ * This function compares the given [lastWord] with a set of possible completions,
+ * returning a sorted list of suggestions that start with the same characters.
+ *
+ * @param lastWord The last word typed by the player for which suggestions are being generated.
+ * @param entries A list of possible completions to be filtered and sorted.
+ * @param transform A function that transforms each item in the list into a string for tab completion.
+ * @param sort Whether to sort the suggestions alphabetically.
+ * @return A mutable list of sorted, case-insensitive suggestions that match the last word.
+ */
+inline fun <T> tabComplete(lastWord: String, entries: Collection<T>, sort: Boolean = true, transform: (T) -> String): List<String> {
+  return tabComplete(lastWord, entries.mapTo(ObjectArrayList(entries.size), transform), sort)
 }
+

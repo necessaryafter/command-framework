@@ -16,7 +16,7 @@ import kotlin.reflect.*
  * It provides several utility functions for accessing and verifying arguments, as well as
  * obtaining information about the sender who executed the command.
  */
-interface Argumentable : Iterable<String> {
+interface Context : Iterable<String> {
   
   /**
    * The name of the command that holds all arguments.
@@ -181,7 +181,7 @@ interface Argumentable : Iterable<String> {
  * often used to display help information or as feedback when required
  * arguments are missing.
  */
-inline val Argumentable.usage: String get() = instructor.usage
+inline val Context.usage: String get() = instructor.usage
 
 /**
  * Returns the last index of all arguments in this argumentable object.
@@ -189,7 +189,7 @@ inline val Argumentable.usage: String get() = instructor.usage
  * Useful for getting the final index in the argument array, typically
  * for reverse iteration or checking elements at the end of the argument list.
  */
-inline val Argumentable.lastIndex get() = arguments.lastIndex
+inline val Context.lastIndex get() = arguments.lastIndex
 
 /**
  * Checks if this argumentable object contains an argument
@@ -198,7 +198,7 @@ inline val Argumentable.lastIndex get() = arguments.lastIndex
  * @param index The index to check in the argument list.
  * @return `true` if the argument exists at the given index, otherwise `false`.
  */
-operator fun Argumentable.contains(index: Int): Boolean = index < size
+operator fun Context.contains(index: Int): Boolean = index < size
 
 /**
  * Gets a nullable optional character at the specified index.
@@ -211,7 +211,7 @@ operator fun Argumentable.contains(index: Int): Boolean = index < size
  * @param permission Optional permission required to access the argument.
  * @return The character at the specified index or `null` if not found.
  */
-fun Argumentable.nullableChar(
+fun Context.nullableChar(
   index: Int = currentIndex,
   permission: String? = null,
 ): Char? {
@@ -230,7 +230,7 @@ fun Argumentable.nullableChar(
  * @param permission Optional permission required to access the argument.
  * @return The character at the specified index or `null` if not found.
  */
-fun Argumentable.optionalChar(
+fun Context.optionalChar(
   index: Int = currentIndex,
   invalid: String = "§cCaractere não encontrado.",
   permission: String? = null,
@@ -252,7 +252,7 @@ fun Argumentable.optionalChar(
  * @param permission Optional permission required to access the argument.
  * @return The character at the specified index.
  */
-fun Argumentable.char(
+fun Context.char(
   index: Int = currentIndex,
   empty: String = usage,
   invalid: String = "§cCaractere não encontrado.",
@@ -271,7 +271,7 @@ fun Argumentable.char(
  * @param permission Optional permission required to access the argument.
  * @return The character array at the specified index or `null`.
  */
-fun Argumentable.optionalCharArray(
+fun Context.optionalCharArray(
   index: Int = currentIndex,
   permission: String? = null,
 ): CharArray? {
@@ -288,7 +288,7 @@ fun Argumentable.optionalCharArray(
  * @param permission Optional permission required to access the argument.
  * @return The character array at the specified index.
  */
-fun Argumentable.charArray(
+fun Context.charArray(
   index: Int = currentIndex,
   message: String = usage,
   permission: String? = null,
@@ -307,7 +307,7 @@ fun Argumentable.charArray(
  * @param permission Optional permission required to access the argument.
  * @return The boolean value at the specified index or `null`.
  */
-fun Argumentable.nullableBoolean(
+fun Context.nullableBoolean(
   index: Int = currentIndex,
   permission: String? = null,
 ): Boolean? {
@@ -326,7 +326,7 @@ fun Argumentable.nullableBoolean(
  * @param permission Optional permission required to access the argument.
  * @return The boolean value at the specified index or `null`.
  */
-fun Argumentable.optionalBoolean(
+fun Context.optionalBoolean(
   index: Int = currentIndex,
   invalid: String = "§cValor true/false inválido.",
   permission: String? = null,
@@ -348,7 +348,7 @@ fun Argumentable.optionalBoolean(
  * @param permission Optional permission required to access the argument.
  * @return The boolean value at the specified index.
  */
-fun Argumentable.boolean(
+fun Context.boolean(
   index: Int = currentIndex,
   empty: String = usage,
   invalid: String = "§cValor true/false inválido.",
@@ -369,7 +369,7 @@ fun Argumentable.boolean(
  * @param permission Optional permission required to access the argument.
  * @return The byte value at the specified index or `null`.
  */
-fun Argumentable.nullableByte(
+fun Context.nullableByte(
   index: Int = currentIndex,
   permission: String? = null,
 ): Byte? {
@@ -388,7 +388,7 @@ fun Argumentable.nullableByte(
  * @param permission Optional permission required to access the argument.
  * @return The byte value at the specified index or `null`.
  */
-fun Argumentable.optionalByte(
+fun Context.optionalByte(
   index: Int = currentIndex,
   invalid: String = "§cValor numérico Byte não encontrado.",
   permission: String? = null,
@@ -410,7 +410,7 @@ fun Argumentable.optionalByte(
  * @param permission Optional permission required to access the argument.
  * @return The byte value at the specified index.
  */
-fun Argumentable.byte(
+fun Context.byte(
   index: Int = currentIndex,
   empty: String = usage,
   invalid: String = "§cValor numérico Byte não encontrado.",
@@ -431,7 +431,7 @@ fun Argumentable.byte(
  * @param permission Optional permission required to access the argument.
  * @return The short value at the specified index or `null`.
  */
-fun Argumentable.nullableShort(
+fun Context.nullableShort(
   index: Int = currentIndex,
   permission: String? = null,
 ): Short? {
@@ -450,7 +450,7 @@ fun Argumentable.nullableShort(
  * @param permission Optional permission required to access the argument.
  * @return The short value at the specified index or `null`.
  */
-fun Argumentable.optionalShort(
+fun Context.optionalShort(
   index: Int = currentIndex,
   invalid: String = "§cValor numérico Short não encontrado.",
   permission: String? = null,
@@ -472,7 +472,7 @@ fun Argumentable.optionalShort(
  * @param permission Optional permission required to access the argument.
  * @return The short value at the specified index.
  */
-fun Argumentable.short(
+fun Context.short(
   index: Int = currentIndex,
   empty: String = usage,
   invalid: String = "§cValor numérico Short não encontrado.",
@@ -493,7 +493,7 @@ fun Argumentable.short(
  * @param permission Optional permission required to access the argument.
  * @return The nullable integer value at the specified index, or null if not found.
  */
-fun Argumentable.nullableInt(
+fun Context.nullableInt(
   index: Int = currentIndex,
   permission: String? = null,
 ): Int? {
@@ -512,7 +512,7 @@ fun Argumentable.nullableInt(
  * @param permission Optional permission required to access the argument.
  * @return The optional integer value at the specified index, or null if not found.
  */
-fun Argumentable.optionalInt(
+fun Context.optionalInt(
   index: Int = currentIndex,
   found: String = "§cValor numérico Int não encontrado.",
   permission: String? = null,
@@ -534,7 +534,7 @@ fun Argumentable.optionalInt(
  * @param permission Optional permission required to access the argument.
  * @return The integer value at the specified index.
  */
-fun Argumentable.int(
+fun Context.int(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cValor numérico Int não encontrado.",
@@ -555,7 +555,7 @@ fun Argumentable.int(
  * @param permission Optional permission required to access the argument.
  * @return The nullable long value at the specified index, or null if not found.
  */
-fun Argumentable.nullableLong(
+fun Context.nullableLong(
   index: Int = currentIndex,
   permission: String? = null,
 ): Long? {
@@ -574,7 +574,7 @@ fun Argumentable.nullableLong(
  * @param permission Optional permission required to access the argument.
  * @return The optional long value at the specified index, or null if not found.
  */
-fun Argumentable.optionalLong(
+fun Context.optionalLong(
   index: Int = currentIndex,
   found: String = "§cValor numérico Long não encontrado.",
   permission: String? = null,
@@ -596,7 +596,7 @@ fun Argumentable.optionalLong(
  * @param permission Optional permission required to access the argument.
  * @return The long value at the specified index.
  */
-fun Argumentable.long(
+fun Context.long(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cValor numérico Long não encontrado.",
@@ -617,7 +617,7 @@ fun Argumentable.long(
  * @param permission Optional permission required to access the argument.
  * @return The nullable float value at the specified index, or null if not found.
  */
-fun Argumentable.nullableFloat(
+fun Context.nullableFloat(
   index: Int = currentIndex,
   permission: String? = null,
 ): Float? {
@@ -636,7 +636,7 @@ fun Argumentable.nullableFloat(
  * @param permission Optional permission required to access the argument.
  * @return The optional float value at the specified index, or null if not found.
  */
-fun Argumentable.optionalFloat(
+fun Context.optionalFloat(
   index: Int = currentIndex,
   found: String = "§cValor numérico Float não encontrado.",
   permission: String? = null,
@@ -658,7 +658,7 @@ fun Argumentable.optionalFloat(
  * @param permission Optional permission required to access the argument.
  * @return The float value at the specified index.
  */
-fun Argumentable.float(
+fun Context.float(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cValor numérico Float não encontrado.",
@@ -679,7 +679,7 @@ fun Argumentable.float(
  * @param permission Optional permission required to access the argument.
  * @return The nullable double value at the specified index, or null if not found.
  */
-fun Argumentable.nullableDouble(
+fun Context.nullableDouble(
   index: Int = currentIndex,
   permission: String? = null,
 ): Double? {
@@ -698,7 +698,7 @@ fun Argumentable.nullableDouble(
  * @param permission Optional permission required to access the argument.
  * @return The optional double value at the specified index, or null if not found.
  */
-fun Argumentable.optionalDouble(
+fun Context.optionalDouble(
   index: Int = currentIndex,
   found: String = "§cValor numérico Double não encontrado.",
   permission: String? = null,
@@ -720,7 +720,7 @@ fun Argumentable.optionalDouble(
  * @param permission Optional permission required to access the argument.
  * @return The double value at the specified index.
  */
-fun Argumentable.double(
+fun Context.double(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cValor numérico Double não encontrado.",
@@ -746,7 +746,7 @@ fun Argumentable.double(
  * @param permission Optional permission required to access the argument.
  * @return The `Player` object associated with the provided name or `null` if not found.
  */
-fun Argumentable.nullablePlayer(
+fun Context.nullablePlayer(
   index: Int = currentIndex,
   permission: String? = null,
 ): Player? {
@@ -770,7 +770,7 @@ fun Argumentable.nullablePlayer(
  * @param permission Optional permission required to access the argument.
  * @return The `Player` object associated with the provided name or `null` if not found.
  */
-fun Argumentable.optionalPlayer(
+fun Context.optionalPlayer(
   index: Int = currentIndex,
   found: String = "§cJogador não encontrado.",
   permission: String? = null,
@@ -798,7 +798,7 @@ fun Argumentable.optionalPlayer(
  * @param permission Optional permission required to access the argument.
  * @return The `Player` object associated with the provided name.
  */
-fun Argumentable.player(
+fun Context.player(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cJogador não encontrado.",
@@ -828,7 +828,7 @@ fun Argumentable.player(
  * @param permission Optional permission required to access the argument.
  * @return The `Player` object associated with the provided name or the sender if the sender is a player.
  */
-fun Argumentable.playerOrSender(
+fun Context.playerOrSender(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cJogador não encontrado.",
@@ -854,7 +854,7 @@ fun Argumentable.playerOrSender(
  * @param permission Optional permission required to access the argument.
  * @return The `OfflinePlayer` object associated with the provided name or `null` if not found.
  */
-fun Argumentable.nullableOfflinePlayer(
+fun Context.nullableOfflinePlayer(
   index: Int = currentIndex,
   permission: String? = null,
 ): OfflinePlayer? {
@@ -880,7 +880,7 @@ fun Argumentable.nullableOfflinePlayer(
  * @param permission Optional permission required to access the argument.
  * @return The `OfflinePlayer` object associated with the provided name or `null` if not found.
  */
-fun Argumentable.optionalOfflinePlayer(
+fun Context.optionalOfflinePlayer(
   index: Int = currentIndex,
   found: String = "§cJogador não encontrado.",
   permission: String? = null,
@@ -909,7 +909,7 @@ fun Argumentable.optionalOfflinePlayer(
  * @param permission Optional permission required to access the argument.
  * @return The `OfflinePlayer` object associated with the provided name.
  */
-fun Argumentable.offlinePlayer(
+fun Context.offlinePlayer(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cJogador não encontrado.",
@@ -936,7 +936,7 @@ fun Argumentable.offlinePlayer(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `GameMode` object if found, or null if the index is invalid or the game mode does not exist.
  */
-fun Argumentable.nullableGamemode(
+fun Context.nullableGamemode(
   index: Int = currentIndex,
   permission: String? = null,
 ): GameMode? {
@@ -960,7 +960,7 @@ fun Argumentable.nullableGamemode(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `GameMode` object if found, or null if the index is invalid or the game mode does not exist.
  */
-fun Argumentable.optionalGamemode(
+fun Context.optionalGamemode(
   index: Int = currentIndex,
   found: String = "§cMode de jogo não encontrado.",
   permission: String? = null,
@@ -987,7 +987,7 @@ fun Argumentable.optionalGamemode(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `GameMode` object associated with the provided name.
  */
-fun Argumentable.gamemode(
+fun Context.gamemode(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cMode de jogo não encontrado.",
@@ -1013,7 +1013,7 @@ fun Argumentable.gamemode(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Enchantment` object if found, or null if the index is invalid or the enchantment does not exist.
  */
-fun Argumentable.nullableEnchantment(
+fun Context.nullableEnchantment(
   index: Int = currentIndex,
   permission: String? = null,
 ): Enchantment? {
@@ -1037,7 +1037,7 @@ fun Argumentable.nullableEnchantment(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Enchantment` object if found, or null if the index is invalid or the enchantment does not exist.
  */
-fun Argumentable.optionalEnchantment(
+fun Context.optionalEnchantment(
   index: Int = currentIndex,
   found: String = "§cEncantamento não encontrado.",
   permission: String? = null,
@@ -1064,7 +1064,7 @@ fun Argumentable.optionalEnchantment(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Enchantment` object associated with the provided name.
  */
-fun Argumentable.enchantment(
+fun Context.enchantment(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cEncantamento não encontrado.",
@@ -1090,7 +1090,7 @@ fun Argumentable.enchantment(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `World` object if found, or null if the index is invalid or the world does not exist.
  */
-fun Argumentable.nullableWorld(
+fun Context.nullableWorld(
   index: Int = currentIndex,
   permission: String? = null,
 ): World? {
@@ -1114,7 +1114,7 @@ fun Argumentable.nullableWorld(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `World` object if found, or null if the index is invalid or the world does not exist.
  */
-fun Argumentable.optionalWorld(
+fun Context.optionalWorld(
   index: Int = currentIndex,
   found: String = "§cMundo não encontrado.",
   permission: String? = null,
@@ -1141,7 +1141,7 @@ fun Argumentable.optionalWorld(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `World` object associated with the provided name.
  */
-fun Argumentable.world(
+fun Context.world(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cMundo não encontrado.",
@@ -1167,7 +1167,7 @@ fun Argumentable.world(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Materials` object if found, or null if the index is invalid or the material does not exist.
  */
-fun Argumentable.nullableMaterial(
+fun Context.nullableMaterial(
   index: Int = currentIndex,
   permission: String? = null,
 ): Material? {
@@ -1191,7 +1191,7 @@ fun Argumentable.nullableMaterial(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Materials` object if found, or null if the index is invalid or the material does not exist.
  */
-fun Argumentable.optionalMaterial(
+fun Context.optionalMaterial(
   index: Int = currentIndex,
   found: String = "§cMaterial não encontrado.",
   permission: String? = null,
@@ -1218,7 +1218,7 @@ fun Argumentable.optionalMaterial(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Materials` object associated with the provided name.
  */
-fun Argumentable.material(
+fun Context.material(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cMaterial não encontrado.",
@@ -1244,7 +1244,7 @@ fun Argumentable.material(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `MaterialData` object if found, or null if the index is invalid or the material data does not exist.
  */
-fun Argumentable.nullableMaterialData(
+fun Context.nullableMaterialData(
   index: Int = currentIndex,
   permission: String? = null,
 ): MaterialData? {
@@ -1268,7 +1268,7 @@ fun Argumentable.nullableMaterialData(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `MaterialData` object if found, or null if the index is invalid or the material data does not exist.
  */
-fun Argumentable.optionalMaterialData(
+fun Context.optionalMaterialData(
   index: Int = currentIndex,
   found: String = "§cMaterial Data não encontrado.",
   permission: String? = null,
@@ -1295,7 +1295,7 @@ fun Argumentable.optionalMaterialData(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `MaterialData` object associated with the provided name.
  */
-fun Argumentable.materialData(
+fun Context.materialData(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cMaterial Data não encontrado.",
@@ -1321,7 +1321,7 @@ fun Argumentable.materialData(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `EntityType` object if found, or null if the index is invalid or the entity type does not exist.
  */
-fun Argumentable.nullableEntityType(
+fun Context.nullableEntityType(
   index: Int = currentIndex,
   permission: String? = null,
 ): EntityType? {
@@ -1345,7 +1345,7 @@ fun Argumentable.nullableEntityType(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `EntityType` object if found, or null if the index is invalid or the entity type does not exist.
  */
-fun Argumentable.optionalEntityType(
+fun Context.optionalEntityType(
   index: Int = currentIndex,
   found: String = "§cEntidade não encontrada.",
   permission: String? = null,
@@ -1372,7 +1372,7 @@ fun Argumentable.optionalEntityType(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `EntityType` object associated with the provided name.
  */
-fun Argumentable.entityType(
+fun Context.entityType(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cEntidade não encontrada.",
@@ -1398,7 +1398,7 @@ fun Argumentable.entityType(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Sound` object if found, or null if the index is invalid or the sound does not exist.
  */
-fun Argumentable.nullableSound(
+fun Context.nullableSound(
   index: Int = currentIndex,
   permission: String? = null,
 ): Sound? {
@@ -1422,7 +1422,7 @@ fun Argumentable.nullableSound(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Sound` object if found, or null if the index is invalid or the sound does not exist.
  */
-fun Argumentable.optionalSound(
+fun Context.optionalSound(
   index: Int = currentIndex,
   found: String = "§cSom não encontrado.",
   permission: String? = null,
@@ -1449,7 +1449,7 @@ fun Argumentable.optionalSound(
  * @param permission Optional permission required to access the argument.
  * @return The corresponding `Sound` object associated with the provided name.
  */
-fun Argumentable.sound(
+fun Context.sound(
   index: Int = currentIndex,
   empty: String = usage,
   found: String = "§cSom não encontrado.",
@@ -1475,7 +1475,7 @@ fun Argumentable.sound(
  * @param finalIndex The ending index for the array slice. Default is `lastIndex`.
  * @return An array of strings if found, or null if the range is invalid or the array is empty.
  */
-fun Argumentable.optionalArray(index: Int = currentIndex, finalIndex: Int = lastIndex): Array<out String>? {
+fun Context.optionalArray(index: Int = currentIndex, finalIndex: Int = lastIndex): Array<out String>? {
   val array = runCatching { arguments.sliceArray(index..finalIndex) }.getOrNull()
   return when {
     array.isNullOrEmpty() -> null
@@ -1499,7 +1499,7 @@ fun Argumentable.optionalArray(index: Int = currentIndex, finalIndex: Int = last
  * @param message The error message if the array is empty or invalid. Default is `usage`.
  * @return An array of strings associated with the specified range.
  */
-fun Argumentable.array(
+fun Context.array(
   index: Int = currentIndex,
   finalIndex: Int = lastIndex,
   message: String = usage,
@@ -1521,7 +1521,7 @@ fun Argumentable.array(
  * @param finalIndex The ending index for the list slice. Default is `lastIndex`.
  * @return A list of strings if found, or null if the range is invalid or the list is empty.
  */
-fun Argumentable.optionalList(index: Int = currentIndex, finalIndex: Int = lastIndex): List<String>? {
+fun Context.optionalList(index: Int = currentIndex, finalIndex: Int = lastIndex): List<String>? {
   val list = runCatching { arguments.slice(index..finalIndex) }.getOrNull()
   return when {
     list.isNullOrEmpty() -> null
@@ -1545,7 +1545,7 @@ fun Argumentable.optionalList(index: Int = currentIndex, finalIndex: Int = lastI
  * @param message The error message if the list is empty or invalid. Default is `usage`.
  * @return A list of strings associated with the specified range.
  */
-fun Argumentable.list(
+fun Context.list(
   index: Int = currentIndex,
   finalIndex: Int = lastIndex,
   message: String = usage,
@@ -1563,7 +1563,7 @@ fun Argumentable.list(
  *
  * @return True if the validation succeeds; otherwise, fails with the provided message.
  */
-fun Argumentable.validate(valide: Boolean, message: String = usage): Boolean = if (valide) true else fail(message)
+fun Context.validate(valide: Boolean, message: String = usage): Boolean = if (valide) true else fail(message)
 
 /**
  * Validates a boolean condition and fails with the specified message if the condition is true.
@@ -1577,7 +1577,7 @@ fun Argumentable.validate(valide: Boolean, message: String = usage): Boolean = i
  *
  * @return True if the validation succeeds; otherwise, fails with the provided message.
  */
-fun Argumentable.validateNot(valide: Boolean, message: String = usage): Boolean = if (!valide) true else fail(message)
+fun Context.validateNot(valide: Boolean, message: String = usage): Boolean = if (!valide) true else fail(message)
 
 /**
  * Joins all arguments into a single string, separated by spaces.
@@ -1587,7 +1587,7 @@ fun Argumentable.validateNot(valide: Boolean, message: String = usage): Boolean 
  *
  * @return A single string representing all arguments joined together.
  */
-fun Argumentable.join(): String = arguments.joinToString(" ")
+fun Context.join(): String = arguments.joinToString(" ")
 
 /**
  * Joins all arguments into a single string, separated by spaces, and fails with the specified message if the arguments are empty.
@@ -1598,7 +1598,7 @@ fun Argumentable.join(): String = arguments.joinToString(" ")
  * @param message The message to display if the arguments are empty.
  * @return A single string representing all arguments joined together.
  */
-fun Argumentable.joinNotEmpty(message: String): String {
+fun Context.joinNotEmpty(message: String): String {
   return if (isEmpty()) fail(message) else join()
 }
 
@@ -1612,7 +1612,7 @@ fun Argumentable.joinNotEmpty(message: String): String {
  * @param finalIndex The ending index for joining arguments. Default is `lastIndex`.
  * @return A single string representing the arguments joined together, or an empty string if none are found.
  */
-fun Argumentable.joinInRange(index: Int = currentIndex, finalIndex: Int = lastIndex): String {
+fun Context.joinInRange(index: Int = currentIndex, finalIndex: Int = lastIndex): String {
   val list = optionalList(index, finalIndex) ?: return ""
   return list.joinToString(" ")
 }
@@ -1627,7 +1627,7 @@ fun Argumentable.joinInRange(index: Int = currentIndex, finalIndex: Int = lastIn
  * @param end The ending index for joining arguments. Default is `lastIndex`.
  * @return A single string representing the joined arguments.
  */
-fun Argumentable.joinNotEmpty(start: Int = 0, end: Int = lastIndex): String {
+fun Context.joinNotEmpty(start: Int = 0, end: Int = lastIndex): String {
   val joined = joinInRange(start, end)
   return joined.ifEmpty { failUsage() }
 }
@@ -1643,7 +1643,7 @@ fun Argumentable.joinNotEmpty(start: Int = 0, end: Int = lastIndex): String {
  * @return The data that was set on the property.
  * @throws IllegalArgumentException if the property type is not serializable by command.
  */
-fun <T> Argumentable.sync(value: T, prop: KMutableProperty1<T, Any>): Any {
+fun <T> Context.sync(value: T, prop: KMutableProperty1<T, Any>): Any {
   val data = when (prop.returnType) {
     typeOf<String>() -> joinNotEmpty()
     typeOf<Int>() -> int()
@@ -1671,7 +1671,7 @@ fun <T> Argumentable.sync(value: T, prop: KMutableProperty1<T, Any>): Any {
  * @param permission The permission string to check against.
  * @return True if the sender has the permission; otherwise, false.
  */
-fun Argumentable.hasPermission(permission: String): Boolean {
+fun Context.hasPermission(permission: String): Boolean {
   return sender.hasPermission(permission)
 }
 
@@ -1684,7 +1684,7 @@ fun Argumentable.hasPermission(permission: String): Boolean {
  * @param message The message to display if the validation fails. Default is "§cApenas o Console pode executar este comando."
  * @return True if the validation succeeds; otherwise, fails with the provided message.
  */
-fun Argumentable.validateConsole(
+fun Context.validateConsole(
   message: String = "§cApenas o Console pode executar este comando.",
 ) = validate(isConsole, message)
 
@@ -1697,7 +1697,7 @@ fun Argumentable.validateConsole(
  * @param message The message to display if the validation fails. Default is "§cApenas jogadores podem executar este comando."
  * @return True if the validation succeeds; otherwise, fails with the provided message.
  */
-fun Argumentable.validatePlayer(
+fun Context.validatePlayer(
   message: String = "§cApenas jogadores podem executar este comando.",
 ) = validate(isPlayer, message)
 
@@ -1711,7 +1711,7 @@ fun Argumentable.validatePlayer(
  * @param message The message to display if the validation fails. Default is "§cVocê não tem permissão para executar esse comando."
  * @return True if the validation succeeds; otherwise, fails with the provided message.
  */
-fun Argumentable.validatePermission(
+fun Context.validatePermission(
   permission: String,
   message: String = "§cVocê não tem permissão para executar esse comando.",
 ) = validate(hasPermission(permission), message)
@@ -1721,7 +1721,7 @@ fun Argumentable.validatePermission(
  *
  * This function retrieves the usage information from the instructor and sends it as a message to the sender.
  */
-fun Argumentable.msgUsage() = msg(instructor.usage)
+fun Context.msgUsage() = msg(instructor.usage)
 
 /**
  * Sends a message to the command sender.
@@ -1730,7 +1730,7 @@ fun Argumentable.msgUsage() = msg(instructor.usage)
  *
  * @param message The message to send.
  */
-fun Argumentable.msg(message: String) {
+fun Context.msg(message: String) {
   sender.sendMessage(message)
 }
 
@@ -1742,7 +1742,7 @@ fun Argumentable.msg(message: String) {
  *
  * @param message The message to send as a `TextComponent`.
  */
-fun Argumentable.msg(message: TextComponent) {
+fun Context.msg(message: TextComponent) {
   if (isPlayer) player.spigot().sendMessage(message)
 }
 
@@ -1755,6 +1755,6 @@ fun Argumentable.msg(message: TextComponent) {
  * @param volume The volume of the sound. Default is `1f`.
  * @param pitch The pitch of the sound. Default is `1f`.
  */
-fun Argumentable.playSound(sound: Sound, volume: Float = 1f, pitch: Float = 1f) {
+fun Context.playSound(sound: Sound, volume: Float = 1f, pitch: Float = 1f) {
   if (isPlayer) player.playSound(player.location, sound, volume, pitch)
 }

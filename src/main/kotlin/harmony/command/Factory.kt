@@ -10,60 +10,40 @@ import harmony.command.misc.*
  * @param permission Optional permission required to execute the command. If null, no permission is required.
  * @param usage Optional usage instructions for the command. If specified, a formatted usage message will be generated.
  * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
+ * @param completer The completer to be used for this command.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @param action A lambda to define the behavior of the [Instructor] after creation.
  *
  * @return The created [Instructor] instance with all the provided properties applied.
  */
 internal fun internalBuildInstructor(
   name: String,
-  sender: Sender,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
-  async: Boolean = false,
+  completer: Completer? = null,
+  helpPermission: String? = null,
   action: Instructor.() -> Unit,
 ) = Instructor(name.split('|')).apply {
   this.sender = sender
   this.maxArgs = max
-  isAsync = async
-  if (permission != null) this.permission = permission
+  if (permission != null) {
+    this.permission = permission
+  }
   fullyName = name
   if (usage != null) {
     usageArguments = usage
     this.usage = "§cUse: /${this.name} $usage."
   }
+  if (completer != null) {
+    this.completer = completer
+  }
+  if (helpPermission != null) {
+    this.helpPermission = helpPermission
+  }
   action(this)
 }
-
-/**
- * Overloaded version of [internalBuildInstructor] that allows specifying whether only players can execute the command.
- *
- * @param name The name of the command, which can contain multiple aliases separated by '|'.
- * @param onlyPlayers Whether only players can execute the command. If true, the sender is restricted to [Sender.PLAYER].
- * @param permission Optional permission required to execute the command. If null, no permission is required.
- * @param usage Optional usage instructions for the command. If specified, a formatted usage message will be generated.
- * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
- * @param action A lambda to define the behavior of the [Instructor] after creation.
- *
- * @return The created [Instructor] instance with all the provided properties applied.
- */
-internal fun internalBuildInstructor(
-  name: String,
-  onlyPlayers: Boolean = false,
-  permission: String? = null,
-  usage: String? = null,
-  max: Int = -1,
-  async: Boolean = false,
-  action: Instructor.() -> Unit,
-) = internalBuildInstructor(
-  name,
-  sender = if (onlyPlayers) Sender.PLAYER else Sender.ALL,
-  permission = permission,
-  usage = usage,
-  max = max,
-  async = async,
-  action = action
-)
 
 /**
  * Creates an instance of [ChildrenInstructor] as a child of the specified [Instructor].
@@ -76,6 +56,8 @@ internal fun internalBuildInstructor(
  * @param max The maximum number of arguments allowed for the child command. Defaults to -1 (unlimited).
  * @param showHelp Whether this child command should appear in help menus. Defaults to true.
  * @param extraInfo Whether to show extra information about this child command.
+ * @param completer The completer to be used for this child command.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @param action A lambda to define the behavior of the child [Instructor].
  *
  * @return The created [ChildrenInstructor] instance.
@@ -83,13 +65,14 @@ internal fun internalBuildInstructor(
 internal fun internalBuildChildrenInstructor(
   parent: Instructor,
   name: String,
-  sender: Sender,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
-  async: Boolean = false,
+  completer: Completer? = null,
+  helpPermission: String? = null,
   action: Instructor.() -> Unit,
 ) = ChildrenInstructor(parent, name.split('|')).apply {
   this.sender = sender
@@ -103,50 +86,15 @@ internal fun internalBuildChildrenInstructor(
   } else {
     this.usage = parent.usage
   }
+  if (completer != null) {
+    this.completer = completer
+  }
+  if (helpPermission != null) {
+    this.helpPermission = helpPermission
+  }
   this.maxArgs = max
-  isAsync = async
   action(this)
 }
-
-/**
- * Overloaded version of [internalBuildChildrenInstructor] allowing the restriction of the sender to only players.
- *
- * @param parent The parent [Instructor] to which this child will be attached.
- * @param name The name of the child command, which can contain multiple aliases separated by '|'.
- * @param onlyPlayers Whether only players can execute the child command. If true, the sender is restricted to [Sender.PLAYER].
- * @param permission Optional permission required to execute the child command. Defaults to the parent's permission.
- * @param usage Optional usage instructions for the child command.
- * @param max The maximum number of arguments allowed for the child command. Defaults to -1 (unlimited).
- * @param showHelp Whether this child command should appear in help menus. Defaults to true.
- * @param extraInfo Whether to show extra information about this child command.
- * @param action A lambda to define the behavior of the child [Instructor].
- *
- * @return The created [ChildrenInstructor] instance.
- */
-internal fun internalBuildChildrenInstructor(
-  parent: Instructor,
-  name: String,
-  onlyPlayers: Boolean = false,
-  permission: String? = null,
-  usage: String? = null,
-  max: Int = -1,
-  showHelp: Boolean = true,
-  extraInfo: Boolean = true,
-  async: Boolean = false,
-  action: Instructor.() -> Unit,
-) = internalBuildChildrenInstructor(
-  parent,
-  name,
-  sender = if (onlyPlayers) Sender.PLAYER else Sender.ALL,
-  permission = permission,
-  usage = usage,
-  max = max,
-  showHelp = showHelp,
-  extraInfo = extraInfo,
-  async = async,
-  action = action
-)
-
 
 /**
  * Creates a child command for an existing [Instructor].
@@ -159,17 +107,20 @@ internal fun internalBuildChildrenInstructor(
  * @param showHelp Whether this child command should appear in help menus. Defaults to true.
  * @param extraInfo Whether to show extra information about this child command.
  * @param action A lambda to define the behavior of the child [Instructor].
+ * @param completer The completer to be used for this child command.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @return The created [ChildrenInstructor] instance attached to the parent.
  */
 internal fun Instructor.internalAppendChildren(
   name: String,
-  sender: Sender,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
-  async: Boolean = false,
+  completer: Completer? = null,
+  helpPermission: String? = null,
   action: Instructor.() -> Unit,
 ): ChildrenInstructor {
   val children = internalBuildChildrenInstructor(
@@ -181,51 +132,11 @@ internal fun Instructor.internalAppendChildren(
     max = max,
     showHelp = showHelp,
     extraInfo = extraInfo,
-    async = async,
+    completer = completer,
+    helpPermission = helpPermission,
     action = action
   )
   
-  addChildren(children)
-  return children
-}
-
-/**
- * Creates a child command for an existing [Instructor].
- *
- * @param name The name of the child command.
- * @param onlyPlayers Whether only players can execute the child command. Defaults to false.
- * @param permission Optional permission required to execute the child command. Defaults to the parent's permission.
- * @param usage Optional usage instructions for the child command.
- * @param max The maximum number of arguments allowed for the child command.
- * @param showHelp Whether this child command should appear in help menus.
- * @param extraInfo Whether to show extra information about the child command.
- * @param action A lambda to define the behavior of the child command.
- *
- * @return The created [ChildrenInstructor] instance attached to the parent.
- */
-fun Instructor.internalAppendChildren(
-  name: String,
-  onlyPlayers: Boolean = false,
-  permission: String? = null,
-  usage: String? = null,
-  max: Int = -1,
-  showHelp: Boolean = true,
-  extraInfo: Boolean = true,
-  async: Boolean = false,
-  action: Instructor.() -> Unit,
-): ChildrenInstructor {
-  val children = internalBuildChildrenInstructor(
-    this,
-    name,
-    onlyPlayers = onlyPlayers,
-    permission = permission,
-    usage = usage,
-    max = max,
-    showHelp = showHelp,
-    extraInfo = extraInfo,
-    async = async,
-    action = action
-  )
   addChildren(children)
   return children
 }
@@ -238,53 +149,30 @@ fun Instructor.internalAppendChildren(
  * @param permission Optional permission required to execute the command. If null, no permission is required.
  * @param usage Optional usage instructions for the command.
  * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
+ * @param completer The completer to be used for this command.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @param action A lambda to define the behavior of the command.
  *
  * @return The created and registered [Instructor] instance.
  */
 fun ComplexCommand(
   name: String,
-  sender: Sender,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
-  async: Boolean = false,
-  action: Instructor.() -> Unit,
-): Instructor {
-  val command =
-    internalBuildInstructor(name, sender = sender, permission = permission, usage = usage, max = max, async = async, action = action)
-  command.register()
-  return command
-}
-
-/**
- * Registers a complex command with multiple potential configurations.
- *
- * @param name The name of the command.
- * @param onlyPlayers Whether only players can execute the command. Defaults to false.
- * @param permission Optional permission required to execute the command. If null, no permission is required.
- * @param usage Optional usage instructions for the command.
- * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
- * @param action A lambda to define the behavior of the command.
- *
- * @return The created and registered [Instructor] instance.
- */
-fun ComplexCommand(
-  name: String,
-  onlyPlayers: Boolean = false,
-  permission: String? = null,
-  usage: String? = null,
-  max: Int = -1,
-  async: Boolean = false,
+  completer: Completer? = null,
+  helpPermission: String? = null,
   action: Instructor.() -> Unit,
 ): Instructor {
   val command = internalBuildInstructor(
     name,
-    onlyPlayers = onlyPlayers,
+    sender = sender,
     permission = permission,
     usage = usage,
     max = max,
-    async = async,
+    completer = completer,
+    helpPermission = helpPermission,
     action = action
   )
   command.register()
@@ -299,94 +187,73 @@ fun ComplexCommand(
  * @param permission Optional permission required to execute the command. If null, no permission is required.
  * @param usage Optional usage instructions for the command.
  * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
+ * @param completer The completer to be used for this command.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @param action A lambda to define the behavior of the command.
  *
  * @return The created and registered [Instructor] instance.
  */
 fun Command(
   name: String,
-  sender: Sender,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
-  async: Boolean = false,
-  action: Argumentable.() -> Unit,
+  completer: Completer? = null,
+  helpPermission: String? = null,
+  action: Context.() -> Unit,
 ): Instructor {
-  val command = internalBuildInstructor(name, sender = sender, permission = permission, usage = usage, max = max, async = async) {
+  return internalBuildInstructor(
+    name,
+    sender = sender,
+    permission = permission,
+    usage = usage,
+    completer = completer,
+    helpPermission = helpPermission,
+    max = max
+  ) {
     performs(action)
+    register()
   }
-  
-  command.register()
-  return command
 }
 
 /**
  * Registers a simplified command with no extra configuration.
  *
  * @param name The name of the command.
- * @param onlyPlayers Whether only players can execute the command. Defaults to false.
+ * @param sender The type of sender that can execute the command.
  * @param permission Optional permission required to execute the command. If null, no permission is required.
  * @param usage Optional usage instructions for the command.
  * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
+ * @param completer The completer to be used for this command.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @param action A lambda to define the behavior of the command.
  *
  * @return The created and registered [Instructor] instance.
  */
-fun Command(
+fun CommandAsync(
   name: String,
-  onlyPlayers: Boolean = false,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
-  async: Boolean = false,
-  action: Argumentable.() -> Unit,
+  completer: Completer? = null,
+  helpPermission: String? = null,
+  action: suspend Context.() -> Unit,
 ): Instructor {
-  val command = internalBuildInstructor(name, onlyPlayers = onlyPlayers, permission = permission, usage = usage, max = max, async = async) {
-    performs(action)
+  return internalBuildInstructor(
+    name,
+    sender = sender,
+    permission = permission,
+    usage = usage,
+    completer = completer,
+    helpPermission = helpPermission,
+    max = max
+  ) {
+    performsAsync(action)
+    register()
   }
-  
-  command.register()
-  return command
 }
-
-/**
- * Creates an alternate instructor of this instructable.
- *
- * This function is used to define a more complex instructor, allowing configuration of various
- * properties like the name, permission, usage, maximum arguments, and whether the command is
- * restricted to players only. It also provides an action to be executed by the instructor.
- *
- * @param name The name of the alternate instructor.
- * @param onlyPlayers Whether the instructor should be restricted to players only.
- * @param permission The permission required to execute the instructor, if any.
- * @param usage The usage instructions for the instructor, if any.
- * @param max The maximum number of arguments the instructor can accept. Defaults to -1 for unlimited.
- * @param showHelp Whether help should be shown for this instructor.
- * @param extraInfo Whether extra information should be shown for this instructor when help is shown.
- * @param action The action to be performed by this instructor.
- * @return A [ChildrenInstructor] representing the created alternate instructor.
- */
-fun Instructor.complex(
-  name: String,
-  onlyPlayers: Boolean = false,
-  permission: String? = null,
-  usage: String? = null,
-  max: Int = -1,
-  showHelp: Boolean = true,
-  extraInfo: Boolean = true,
-  async: Boolean = false,
-  action: Instructor.() -> Unit,
-): ChildrenInstructor = internalAppendChildren(
-  name,
-  onlyPlayers = onlyPlayers,
-  permission = permission,
-  usage = usage,
-  max = max,
-  showHelp = showHelp,
-  extraInfo = extraInfo,
-  async = async,
-  action = action
-)
 
 /**
  * Creates an alternate instructor with a specific sender type.
@@ -402,18 +269,21 @@ fun Instructor.complex(
  * @param max The maximum number of arguments the instructor can accept. Defaults to -1 for unlimited.
  * @param showHelp Whether help should be shown for this instructor.
  * @param extraInfo Whether extra information should be shown for this instructor when help is shown.
+ * @param completer The completer to be used for this instructor, if any.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @param action The action to be performed by this instructor.
  * @return A [ChildrenInstructor] representing the created alternate instructor.
  */
 fun Instructor.complex(
   name: String,
-  sender: Sender,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
-  async: Boolean = false,
+  completer: Completer? = null,
+  helpPermission: String? = null,
   action: Instructor.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
@@ -423,45 +293,51 @@ fun Instructor.complex(
   max = max,
   showHelp = showHelp,
   extraInfo = extraInfo,
-  async = async,
+  completer = completer,
+  helpPermission = helpPermission,
   action = action
 )
 
 /**
- * Creates a simple sub-instructor with a specified performer action.
+ * Creates a simple sub-instructor with a specified sender type and performer action.
  *
- * This function creates a subcommand (child) for the current instructor. The [action] provided will
- * be used as the performer action, defining what happens when the subcommand is executed.
+ * This version of the `sub` function allows specifying a custom [Sender], making it more flexible
+ * for defining who can execute the subcommand (e.g., players, console, or both). The [action] provided
+ * will be used as the performer action.
  *
  * @param name The name of the sub-instructor.
- * @param onlyPlayers Whether the sub-instructor should be restricted to players only.
+ * @param sender The type of sender allowed to execute the sub-instructor.
  * @param permission The permission required to execute the sub-instructor, if any.
  * @param usage The usage instructions for the sub-instructor, if any.
  * @param max The maximum number of arguments the sub-instructor can accept. Defaults to -1 for unlimited.
  * @param showHelp Whether help should be shown for this sub-instructor.
  * @param extraInfo Whether extra information should be shown for this instructor when help is shown.
+ * @param completer The completer to be used for this sub-instructor.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @param action The performer action to be executed when this subcommand is called.
  * @return A [ChildrenInstructor] representing the created sub-instructor.
  */
 fun Instructor.sub(
   name: String,
-  onlyPlayers: Boolean = false,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
-  async: Boolean = false,
-  action: Argumentable.() -> Unit,
+  completer: Completer? = null,
+  helpPermission: String? = null,
+  action: Context.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
-  onlyPlayers = onlyPlayers,
+  sender = sender,
   permission = permission,
   usage = usage,
   max = max,
   showHelp = showHelp,
   extraInfo = extraInfo,
-  async = async
+  completer = completer,
+  helpPermission = helpPermission
 ) {
   performs(action)
 }
@@ -480,19 +356,22 @@ fun Instructor.sub(
  * @param max The maximum number of arguments the sub-instructor can accept. Defaults to -1 for unlimited.
  * @param showHelp Whether help should be shown for this sub-instructor.
  * @param extraInfo Whether extra information should be shown for this instructor when help is shown.
+ * @param completer The completer to be used for this sub-instructor.
+ * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
  * @param action The performer action to be executed when this subcommand is called.
  * @return A [ChildrenInstructor] representing the created sub-instructor.
  */
-fun Instructor.sub(
+fun Instructor.subAsync(
   name: String,
-  sender: Sender,
+  sender: Sender = Sender.ALL,
   permission: String? = null,
   usage: String? = null,
   max: Int = -1,
   showHelp: Boolean = true,
   extraInfo: Boolean = true,
-  async: Boolean = false,
-  action: Argumentable.() -> Unit,
+  completer: Completer? = null,
+  helpPermission: String? = null,
+  action: suspend Context.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
   sender = sender,
@@ -501,7 +380,8 @@ fun Instructor.sub(
   max = max,
   showHelp = showHelp,
   extraInfo = extraInfo,
-  async = async
+  completer = completer,
+  helpPermission = helpPermission
 ) {
-  performs(action)
+  performsAsync(action)
 }

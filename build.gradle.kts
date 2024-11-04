@@ -17,7 +17,6 @@ dependencies {
   //compileOnly("org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT") - jitpack not support local repositories...
   compileOnly(fileTree("libs"))
   compileOnly("it.unimi.dsi:fastutil:8.5.13")
-  // kotlin coroutines
   compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 }
 

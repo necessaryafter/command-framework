@@ -5,20 +5,20 @@ import org.bukkit.command.*
 import org.bukkit.entity.*
 
 /**
- * A basic implementation of [Argumentable] for handling command execution logic.
+ * A basic implementation of [Context] for handling command execution logic.
  *
- * This class represents a executor that interacts with a command sender (either a player or console) and
+ * This class represents a context that interacts with a command sender (either a player or console) and
  * executes commands using the provided instructor and arguments.
  *
  * @property sender The entity executing the command.
  * @property instructor The instructor providing command details.
  * @property arguments The arguments passed along with the command.
  */
-class DefaultExecutor(
+class DefaultContext(
   override val sender: CommandSender,
   override val instructor: Instructor,
   override val arguments: Array<out String>,
-) : Argumentable {
+) : Context {
   
   /** The name of the command being executed, derived from the instructor. */
   override val command: String get() = instructor.name
@@ -43,7 +43,7 @@ class DefaultExecutor(
 }
 
 /**
- * A specific executor implementation for console-based command execution.
+ * A specific context implementation for console-based command execution.
  *
  * This class handles commands executed exclusively by the console. It provides behavior for console-only
  * executions, ensuring that player-related methods are not accessible.
@@ -52,11 +52,11 @@ class DefaultExecutor(
  * @property instructor The instructor providing command details.
  * @property arguments The arguments passed along with the command.
  */
-class ConsoleExecutor(
+class ConsoleContext(
   override val sender: CommandSender,
   override val instructor: Instructor,
   override val arguments: Array<out String>,
-) : Argumentable {
+) : Context {
   
   /** The name of the command being executed, derived from the instructor. */
   override val command: String get() = instructor.name
@@ -81,7 +81,7 @@ class ConsoleExecutor(
 }
 
 /**
- * A specific executor implementation for player-based command execution.
+ * A specific context implementation for player-based command execution.
  *
  * This class handles commands executed exclusively by players. It ensures that console-related methods
  * are not accessible and provides behavior specific to player command execution.
@@ -90,11 +90,11 @@ class ConsoleExecutor(
  * @property instructor The instructor providing command details.
  * @property arguments The arguments passed along with the command.
  */
-class PlayerExecutor(
+class PlayerContext(
   override val sender: CommandSender,
   override val instructor: Instructor,
   override val arguments: Array<out String>,
-) : Argumentable {
+) : Context {
   
   /** The name of the command being executed, derived from the instructor. */
   override val command: String get() = instructor.name

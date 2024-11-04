@@ -1,5 +1,8 @@
 package harmony.command
 
+import harmony.command.misc.*
+import kotlinx.coroutines.*
+
 /**
  * Represents an instructable object that can instruct a command to be executed.
  *
@@ -10,23 +13,18 @@ package harmony.command
 interface Instructable {
   
   /**
-   * The current performer action of this instructable object.
+   * The executor of this instructable.
    *
-   * This is a lambda function that will be executed when the instructable command is performed.
-   * It is invoked on an [Argumentable] object.
+   * An [Executor] object that defines the behavior of the instructable command when executed.
    */
-  var executor: Argumentable.() -> Unit
+  var executor: Executor
   
   /**
-   * Sets the new performer action of this instructable object.
+   * The completer of this instructable.
    *
-   * This function allows you to define the action to be performed by setting a new [executor] lambda.
-   *
-   * @param action The lambda defining the behavior of this instructable when executed.
+   * An [Completer] object that defines the behavior of the instructable command completion suggestions.
    */
-  fun performs(action: Argumentable.() -> Unit) {
-    executor = action
-  }
+  var completer: Completer
   
   /**
    * Returns the type of [Sender] that can perform this instructable.
@@ -54,16 +52,6 @@ interface Instructable {
    * for them while executing the command.
    */
   var childrensLookup: MutableMap<String, ChildrenInstructor>
-  
-  /**
-   * If this instructable is asynchronous.
-   *
-   * This property indicates whether the instructable command is asynchronous or synchronous.
-   * Defaults to false.
-   *
-   * @return `true` if the instructable command is asynchronous, `false` otherwise.
-   */
-  var isAsync: Boolean
   
   /**
    * The maximum number of arguments that can be passed to this instructable.
@@ -94,6 +82,16 @@ interface Instructable {
    * @return The usage arguments of this instructable.
    */
   var usageArguments: String
+  
+  /**
+   * Gets the required permission to access the help usage of this instructable.
+   *
+   * If the sender does not have the required permission to access the help usage of this
+   * instructable, the help usage of this instructable will not be displayed.
+   *
+   * @return The required permission, or null/blank if no permission is required.
+   */
+  var helpPermission: String?
   
   /**
    * Gets the full usage of this instructable.
@@ -147,4 +145,89 @@ interface Instructable {
    * @return The fully qualified name of this instructable.
    */
   fun fetchFullyName(): String
+  
+  /**
+   * Sets the new performer action of this instructable object.
+   *
+   * This is for synchronous execution.
+   *
+   * @param action The lambda defining the behavior of this instructable when executed.
+   */
+  fun performs(action: Context.() -> Unit) {
+    executor = Executor {
+      action.invoke(it)
+    }
+  }
+  
+  /**
+   * Sets the new performer action of this instructable object.
+   *
+   * This is for asynchronous execution.
+   *
+   * @param action The lambda defining the behavior of this instructable when executed.
+   */
+  fun performsAsync(action: suspend Context.() -> Unit) {
+    executor = Executor {
+      CommandScope.launch {
+        action.invoke(it)
+      }
+    }
+  }
+  
+  /**
+   * Sets the new completer of this instructable object.
+   *
+   * @param suggestions The suggestions function for the completer.
+   */
+  fun suggests(suggestions: Completer) {
+    completer = suggestions
+  }
+  
+  /**
+   * Sets the new completer of this instructable object.
+   *
+   * ### Note
+   * The returned list is suposed to be created with [tabComplete] function.
+   *
+   * @param suggestions The suggestions function for the completer.
+   */
+  fun suggests(suggestions: Context.(lastWord: String) -> List<String>) {
+    completer = Completer { context, lastWord ->
+      suggestions.invoke(context, lastWord)
+    }
+  }
+  
+  /**
+   * Sets the new completer of this instructable object.
+   *
+   * @param suggestions The suggestions function for the completer.
+   */
+  fun suggests(vararg suggestions: String, sort: Boolean = true) {
+    suggests { _, lastWord ->
+      tabComplete(lastWord, suggestions, sort)
+    }
+  }
+  
+  /**
+   * Sets the new completer of this instructable object.
+   *
+   * @param suggestions The suggestions function for the completer.
+   */
+  fun suggests(suggestions: List<String>, sort: Boolean = true) {
+    suggests { _, lastWord ->
+      tabComplete(lastWord, suggestions, sort)
+    }
+  }
+  
+  /**
+   * Sets the new completer of this instructable object.
+   *
+   * @param entries The suggestions entries values for the completer.
+   * @param suggestions The mapper function for the completer transforming the entries into strings.
+   */
+  fun <T> suggests(entries: Collection<T>, sort: Boolean = true, suggestions: (T) -> String) {
+    suggests { _, lastWord ->
+      tabComplete(lastWord, entries, sort, suggestions)
+    }
+  }
 }

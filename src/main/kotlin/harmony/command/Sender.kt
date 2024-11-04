@@ -40,18 +40,18 @@ open class Sender(val message: String, val display: String) {
   }
   
   /**
-   * Creates a executor that handles the execution of a command.
+   * Creates a context that handles the execution of a command.
    *
-   * This method is responsible for creating an `Argumentable` performer which executes
+   * This method is responsible for creating an `Context` performer which executes
    * the command based on the sender, the instructor, and any arguments passed.
    *
    * @param sender The sender executing the command.
    * @param instructor The instructor managing the command execution process.
    * @param args The arguments provided with the command.
-   * @return An instance of `Argumentable` responsible for handling the command.
+   * @return An instance of `Context` responsible for handling the command.
    */
-  open fun createExecutor(sender: CommandSender, instructor: Instructor, args: Array<out String>): Argumentable {
-    return DefaultExecutor(sender, instructor, args)
+  open fun createContext(sender: CommandSender, instructor: Instructor, args: Array<out String>): Context {
+    return DefaultContext(sender, instructor, args)
   }
 }
 
@@ -74,15 +74,15 @@ object PlayerSender : Sender("§cApenas jogadores podem executar este comando.",
   }
   
   /**
-   * Creates a executor specific to player commands.
+   * Creates a context specific to player commands.
    *
    * @param sender The player executing the command.
    * @param instructor The instructor managing the command execution process.
    * @param args The arguments provided with the command.
    * @return A `PlayerPerformer` responsible for handling the command execution.
    */
-  override fun createExecutor(sender: CommandSender, instructor: Instructor, args: Array<out String>): Argumentable {
-    return PlayerExecutor(sender, instructor, args)
+  override fun createContext(sender: CommandSender, instructor: Instructor, args: Array<out String>): Context {
+    return PlayerContext(sender, instructor, args)
   }
 }
 
@@ -105,14 +105,14 @@ object ConsoleSender : Sender("§cApenas o Console pode executar este comando.",
   }
   
   /**
-   * Creates a executor specific to console commands.
+   * Creates a context specific to console commands.
    *
    * @param sender The console executing the command.
    * @param instructor The instructor managing the command execution process.
    * @param args The arguments provided with the command.
    * @return A `ConsolePerformer` responsible for handling the command execution.
    */
-  override fun createExecutor(sender: CommandSender, instructor: Instructor, args: Array<out String>): Argumentable {
-    return ConsoleExecutor(sender, instructor, args)
+  override fun createContext(sender: CommandSender, instructor: Instructor, args: Array<out String>): Context {
+    return ConsoleContext(sender, instructor, args)
   }
 }

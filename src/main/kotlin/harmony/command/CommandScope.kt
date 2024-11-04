@@ -4,10 +4,10 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.*
 
 /**
- * A coroutine scope for command execution.
+ * An object that serves as a coroutine scope with a SupervisorJob.
  *
- * Its a simple coroutine scope with a [SupervisorJob] to allow for cancellation of child coroutines
- * without interrupting others coroutines.
+ * This object allows for launching coroutines that can be supervised,
+ * meaning that child coroutines can fail without cancelling the parent scope.
  */
 object CommandScope : CoroutineScope {
   override val coroutineContext: CoroutineContext = SupervisorJob()

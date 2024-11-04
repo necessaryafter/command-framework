@@ -1,3 +1,25 @@
+
+### Parâmetros adicionais em sub-comandos
+Sub-comandos suportam 2 parâmetros adicionais para sua amostra no comando de ajuda:
+
+```kt
+fun Instructor.sub(
+  name: String,
+  sender: Sender = Sender.ALL,
+  permission: String? = null,
+  usage: String? = null,
+  max: Int = -1,
+  showHelp: Boolean = true,
+  extraInfo: Boolean = true,
+  completer: Completer? = null,
+  helpPermission: String? = null,
+  action: Context.() -> Unit,
+): ChildrenInstructor
+```
+
+- `showHelp`: se o sub-comando vai ser mostrado na lista de comandos disponíveis do comando de ajuda.
+- `extraInfo`: se o sub-comando vai gerar informações extras na lista de comandos disponíveis do comando de ajuda:
+
 # Command framework
 
 ## Introduction
@@ -12,9 +34,23 @@ repositories {
 }
 
 dependencies {
-  implementation("com.github.networkharmony:command-framework:1.0.5")
+  implementation("com.github.networkharmony:command-framework:1.1.0")
 }
 ```
+
+## 1.1.0 Features:
+### News
+- Enhanced asynchronous command creation
+- Added support to tab completion
+- Added extra permission to help command
+
+### Break-changes
+- Splitted off the command executor into a separate interface
+- Renamed `Argumentable` to `Context`
+- Renamed some functions to be more consistent with their functionality
+
+### Fixes
+- Fixed (possible) NPE when accessing the help command
 
 ## Understanding the framework
 Here below, will follow the main entry of the framework design:
@@ -182,6 +218,11 @@ We have 2 specifics exceptions for handling errors in commands:
 
 ### Using:
 
+Both exceptions have special functions to call them:
+
+- `fail(message: String)`: (`InstructorError`) stops the command execution and send a message to the player.
+- `stop()`: (`InstructorStop`) stops the command execution without sending a message.
+
 ```kt
 // just a simple example of a registry
 val registry = HashMap<String, String>()
@@ -206,6 +247,14 @@ Exceptions that doens't is `InstructorStop` or `InstructorError` will notify the
 
 #### Console message:
 ![image](https://github.com/user-attachments/assets/cca49357-029e-42fa-a304-ccff6f83fe5c)
+
+## Executor:
+Executor interface is used to define the behavior of a command.
+There is no a specific executor implementation.
+
+## Tab-completion:
+Suggestions for tab-completion are made by the `Completer` interface.
+
 
 ## Commons examples:
 After we know almost everything about the framework, here some commons examples:

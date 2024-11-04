@@ -1,7 +1,6 @@
 package harmony.command
 
 import it.unimi.dsi.fastutil.objects.*
-import kotlinx.coroutines.*
 import org.bukkit.*
 import org.bukkit.command.*
 import org.bukkit.entity.*
@@ -18,9 +17,17 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
    * The current performer action of this instructable object.
    *
    * This is a lambda function that will be executed when the instructable command is performed.
-   * It is invoked on an [Argumentable] object.
+   * It is invoked on an [Context] object.
    */
-  override lateinit var executor: Argumentable.() -> Unit
+  override lateinit var executor: Executor
+  
+  /**
+   * The current completer of this instructable object.
+   *
+   * This is a lambda function that will be executed when the instructable command tab complete is performed.
+   * It is invoked on an [Context] object.
+   */
+  override var completer: Completer = SmartCompleter
   
   /**
    * Returns the type of [Sender] that can perform this instructable.
@@ -48,11 +55,6 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
    * for them while executing the command.
    */
   override var childrensLookup: MutableMap<String, ChildrenInstructor> = Object2ObjectOpenHashMap(8)
-  
-  /**
-   * Indicates if this instructable is asynchronous.
-   */
-  override var isAsync = false
   
   /**
    * The maximum number of arguments that can be passed to this instructable.
@@ -83,6 +85,16 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
    * @return The usage arguments of this instructable.
    */
   override var usageArguments = ""
+  
+  /**
+   * Gets the required permission to access the help usage of this instructable.
+   *
+   * If the sender does not have the required permission to access the help usage of this
+   * instructable, the help usage of this instructable will not be displayed.
+   *
+   * @return The required permission, or null/blank if no permission is required.
+   */
+  override var helpPermission: String? = null
   
   /**
    * Creates a new [Instructor] with the given names.
@@ -154,7 +166,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     }
     
     if (!this::executor.isInitialized || isHelpArg(firstArg) && childrens.isNotEmpty()) {
-      if (sender.hasPermission(permission)) {
+      if (helpPermission.isNullOrBlank() || sender.hasPermission(helpPermission)) {
         if (sender is Player) {
           sendHelpToPlayer(sender)
         } else {
@@ -167,14 +179,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     }
     
     try {
-      val action = this.sender.createExecutor(sender, this, args)
-      if (isAsync) {
-        CommandScope.launch {
-          executor.invoke(action)
-        }
-      } else {
-        executor.invoke(action)
-      }
+      executor.execute(this.sender.createContext(sender, this, args))
       return true
     } catch (e: InstructorStop) {
       return false
@@ -182,9 +187,10 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
       sender.sendMessage(e.message)
       return false
     } catch (e: Exception) {
-      if (sender.isOp && sender !is ConsoleCommandSender) {
+      if (sender.isOp /*&& sender !is ConsoleCommandSender*/) {
         sender.sendMessage("§cUm erro inesperado ocorreu: '${e.message}'")
-        //sender.sendMessage(e.stackTraceToString())
+        // TODO: add ability to toggle optional strack tracing sended to players to track errors directly
+        //sender.sendMessage("§8${e.stackTraceToString()}")
       } else {
         sender.sendMessage("§cUm erro inesperado ocorreu. Contate um Administrador.")
       }
@@ -192,6 +198,33 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
       e.printStackTrace()
       return false
     }
+  }
+  
+  /**
+   * Tab completes the instructable command.
+   *
+   * This function is responsible for tab-completing the instructable command based on the sender,
+   * the name of the command, and any arguments passed.
+   *
+   * @param sender The sender executing the command.
+   * @param alias The name of the command.
+   * @param args The arguments passed with the command.
+   * @return A mutable list of sorted, case-insensitive suggestions that match the last word.
+   */
+  override fun tabComplete(sender: CommandSender, alias: String, args: Array<out String>): List<String> {
+    if (args.isEmpty()) {
+      return emptyList()
+    }
+    
+    if (childrens.isNotEmpty()) {
+      val firstArg = args.get(0)
+      val child = findChildren(firstArg)
+      if (child != null) {
+        return child.tabComplete(sender, "$name $firstArg", args.copyOfRange(1, args.size))
+      }
+    }
+    
+    return completer.suggest(this.sender.createContext(sender, this, args), args.last())
   }
   
   /**
