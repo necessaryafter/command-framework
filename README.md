@@ -31,4 +31,16 @@ dependencies {
 - Fixed (possible) NPE when accessing the help command
 
 ## Wiki:
-[wiki](https://github.com/networkharmony/command-framework/wiki)
+[install](https://github.com/networkharmony/command-framework/wiki)
+[core](https://github.com/networkharmony/command-framework/wiki/Understanding-the-main-entries-of-the-framework)
+[arguments](https://github.com/networkharmony/command-framework/wiki/Arguments)
+[executors](https://github.com/networkharmony/command-framework/wiki/Executors)
+[completers](https://github.com/networkharmony/command-framework/wiki/Tab-completion)
+[help-commands](https://github.com/networkharmony/command-framework/wiki/Help-Command)
+[exceptions](https://github.com/networkharmony/command-framework/wiki/Exceptions)
+
+
+
+
+
+
