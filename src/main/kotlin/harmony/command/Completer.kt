@@ -23,7 +23,7 @@ fun interface Completer {
    * @param completer The completer to merge with this one.
    * @return The merged completer.
    */
-  fun merge(completer: Completer): Completer {
+  infix fun merge(completer: Completer): Completer {
     return Completer { context, lastWord ->
       this.suggest(context, lastWord) + completer.suggest(context, lastWord)
     }

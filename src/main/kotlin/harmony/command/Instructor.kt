@@ -1,7 +1,6 @@
 package harmony.command
 
 import it.unimi.dsi.fastutil.objects.*
-import org.bukkit.*
 import org.bukkit.command.*
 import org.bukkit.entity.*
 
@@ -16,7 +15,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
   /**
    * The current performer action of this instructable object.
    *
-   * This is a lambda function that will be executed when the instructable command is performed.
+   * This is a function that will be executed when the instructable command is performed.
    * It is invoked on an [Context] object.
    */
   override lateinit var executor: Executor
@@ -24,10 +23,40 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
   /**
    * The current completer of this instructable object.
    *
-   * This is a lambda function that will be executed when the instructable command tab complete is performed.
+   * This is a function that will be executed when the instructable command tab complete is performed.
    * It is invoked on an [Context] object.
    */
   override var completer: Completer = SmartCompleter
+  
+  /**
+   * The current exception handler of this instructable object.
+   *
+   * This is a function that will be executed when the instructable command throws an exception.
+   */
+  override var exceptionHandler: CommandExceptionHandler = DefaultExceptionHandler
+  
+  /**
+   * The cooldown of this instructable.
+   *
+   * Used to control the rate at which a command can be executed.
+   *
+   * Should be verified with [hasCooldown] before using to avoid errors.
+   */
+  override lateinit var cooldown: CommandCooldown
+  
+  /**
+   * Checks if this instructable has a cooldown.
+   *
+   * @return True if the instructable has a cooldown, false otherwise.
+   */
+  override val hasCooldown get() = this::cooldown.isInitialized
+  
+  /**
+   * The stats of this instructable.
+   *
+   * Used to track command usage statistics.
+   */
+  override var stats: CommandStats = CommandStats()
   
   /**
    * Returns the type of [Sender] that can perform this instructable.
@@ -178,25 +207,40 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
       return false
     }
     
-    try {
-      executor.execute(this.sender.createContext(sender, this, args))
-      return true
-    } catch (e: InstructorStop) {
-      return false
-    } catch (e: InstructorError) {
-      sender.sendMessage(e.message)
-      return false
-    } catch (e: Exception) {
-      if (sender.isOp /*&& sender !is ConsoleCommandSender*/) {
-        sender.sendMessage("§cUm erro inesperado ocorreu: '${e.message}'")
-        // TODO: add ability to toggle optional strack tracing sended to players to track errors directly
-        //sender.sendMessage("§8${e.stackTraceToString()}")
-      } else {
-        sender.sendMessage("§cUm erro inesperado ocorreu. Contate um Administrador.")
+    if (hasCooldown) {
+      if (sender is Player && !cooldown.isReady(sender)) {
+        sender.sendMessage(cooldown.message)
+        return false
       }
-      Bukkit.getConsoleSender().sendMessage("§cErro ao executar o comando '$fullyName'. Executado por ${sender.name}")
-      e.printStackTrace()
+      
+      if (stats.executedCount % cooldown.resetThreshold == 0) {
+        cooldown.resetInactives()
+      }
+    }
+    
+    val context = this.sender.createContext(sender, this, args)
+    val now = System.currentTimeMillis()
+    try {
+      executor.execute(context)
+      stats.successCount++
+      stats.lastSuccess = now
+      return true
+    } catch (exception: Exception) {
+      // We not count exceptions that ins't an InstructorException.
+      if (exception !is InstructorException) {
+        stats.failedCount++
+        stats.lastFailure = now
+      }
+      
+      try {
+        exceptionHandler.handle(exception, this, context)
+      } catch (e: Exception) {
+        throw ExceptionHandlerError(e)
+      }
       return false
+    } finally {
+      stats.executedCount++
+      stats.lastExecution = now
     }
   }
   

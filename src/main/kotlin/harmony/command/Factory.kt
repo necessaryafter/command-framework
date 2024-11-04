@@ -1,6 +1,7 @@
 package harmony.command
 
 import harmony.command.misc.*
+import kotlin.time.*
 
 /**
  * Creates an instance of [Instructor] with the specified properties.
@@ -12,6 +13,8 @@ import harmony.command.misc.*
  * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
  * @param completer The completer to be used for this command.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @param action A lambda to define the behavior of the [Instructor] after creation.
  *
  * @return The created [Instructor] instance with all the provided properties applied.
@@ -24,6 +27,8 @@ internal fun internalBuildInstructor(
   max: Int = -1,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: Instructor.() -> Unit,
 ) = Instructor(name.split('|')).apply {
   this.sender = sender
@@ -42,6 +47,12 @@ internal fun internalBuildInstructor(
   if (helpPermission != null) {
     this.helpPermission = helpPermission
   }
+  if (exceptionHandler != null) {
+    this.exceptionHandler = exceptionHandler
+  }
+  if (cooldown != null) {
+    this.cooldown = CommandCooldown(cooldown)
+  }
   action(this)
 }
 
@@ -58,6 +69,8 @@ internal fun internalBuildInstructor(
  * @param extraInfo Whether to show extra information about this child command.
  * @param completer The completer to be used for this child command.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @param action A lambda to define the behavior of the child [Instructor].
  *
  * @return The created [ChildrenInstructor] instance.
@@ -73,6 +86,8 @@ internal fun internalBuildChildrenInstructor(
   extraInfo: Boolean = true,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: Instructor.() -> Unit,
 ) = ChildrenInstructor(parent, name.split('|')).apply {
   this.sender = sender
@@ -80,6 +95,7 @@ internal fun internalBuildChildrenInstructor(
   fullyName = fetchFullyName()
   showInHelp = showHelp
   this.extraInfo = extraInfo
+  this.maxArgs = max
   if (usage != null) {
     this.usageArguments = usage
     this.usage = usage.let { "§cUse: /$fullyName $it." }
@@ -92,7 +108,12 @@ internal fun internalBuildChildrenInstructor(
   if (helpPermission != null) {
     this.helpPermission = helpPermission
   }
-  this.maxArgs = max
+  if (exceptionHandler != null) {
+    this.exceptionHandler = exceptionHandler
+  }
+  if (cooldown != null) {
+    this.cooldown = CommandCooldown(cooldown)
+  }
   action(this)
 }
 
@@ -109,6 +130,8 @@ internal fun internalBuildChildrenInstructor(
  * @param action A lambda to define the behavior of the child [Instructor].
  * @param completer The completer to be used for this child command.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @return The created [ChildrenInstructor] instance attached to the parent.
  */
 internal fun Instructor.internalAppendChildren(
@@ -121,6 +144,8 @@ internal fun Instructor.internalAppendChildren(
   extraInfo: Boolean = true,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: Instructor.() -> Unit,
 ): ChildrenInstructor {
   val children = internalBuildChildrenInstructor(
@@ -134,6 +159,8 @@ internal fun Instructor.internalAppendChildren(
     extraInfo = extraInfo,
     completer = completer,
     helpPermission = helpPermission,
+    exceptionHandler = exceptionHandler,
+    cooldown = cooldown,
     action = action
   )
   
@@ -151,6 +178,8 @@ internal fun Instructor.internalAppendChildren(
  * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
  * @param completer The completer to be used for this command.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @param action A lambda to define the behavior of the command.
  *
  * @return The created and registered [Instructor] instance.
@@ -163,6 +192,8 @@ fun ComplexCommand(
   max: Int = -1,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: Instructor.() -> Unit,
 ): Instructor {
   val command = internalBuildInstructor(
@@ -173,6 +204,8 @@ fun ComplexCommand(
     max = max,
     completer = completer,
     helpPermission = helpPermission,
+    exceptionHandler = exceptionHandler,
+    cooldown = cooldown,
     action = action
   )
   command.register()
@@ -189,6 +222,8 @@ fun ComplexCommand(
  * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
  * @param completer The completer to be used for this command.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @param action A lambda to define the behavior of the command.
  *
  * @return The created and registered [Instructor] instance.
@@ -201,6 +236,8 @@ fun Command(
   max: Int = -1,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: Context.() -> Unit,
 ): Instructor {
   return internalBuildInstructor(
@@ -210,7 +247,9 @@ fun Command(
     usage = usage,
     completer = completer,
     helpPermission = helpPermission,
-    max = max
+    max = max,
+    exceptionHandler = exceptionHandler,
+    cooldown = cooldown
   ) {
     performs(action)
     register()
@@ -227,6 +266,8 @@ fun Command(
  * @param max The maximum number of arguments allowed for the command. Defaults to -1 (unlimited).
  * @param completer The completer to be used for this command.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @param action A lambda to define the behavior of the command.
  *
  * @return The created and registered [Instructor] instance.
@@ -239,6 +280,8 @@ fun CommandAsync(
   max: Int = -1,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: suspend Context.() -> Unit,
 ): Instructor {
   return internalBuildInstructor(
@@ -248,7 +291,9 @@ fun CommandAsync(
     usage = usage,
     completer = completer,
     helpPermission = helpPermission,
-    max = max
+    max = max,
+    exceptionHandler = exceptionHandler,
+    cooldown = cooldown
   ) {
     performsAsync(action)
     register()
@@ -271,6 +316,8 @@ fun CommandAsync(
  * @param extraInfo Whether extra information should be shown for this instructor when help is shown.
  * @param completer The completer to be used for this instructor, if any.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @param action The action to be performed by this instructor.
  * @return A [ChildrenInstructor] representing the created alternate instructor.
  */
@@ -284,6 +331,8 @@ fun Instructor.complex(
   extraInfo: Boolean = true,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: Instructor.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
@@ -295,6 +344,8 @@ fun Instructor.complex(
   extraInfo = extraInfo,
   completer = completer,
   helpPermission = helpPermission,
+  exceptionHandler = exceptionHandler,
+  cooldown = cooldown,
   action = action
 )
 
@@ -314,6 +365,8 @@ fun Instructor.complex(
  * @param extraInfo Whether extra information should be shown for this instructor when help is shown.
  * @param completer The completer to be used for this sub-instructor.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @param action The performer action to be executed when this subcommand is called.
  * @return A [ChildrenInstructor] representing the created sub-instructor.
  */
@@ -327,6 +380,8 @@ fun Instructor.sub(
   extraInfo: Boolean = true,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: Context.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
@@ -337,7 +392,9 @@ fun Instructor.sub(
   showHelp = showHelp,
   extraInfo = extraInfo,
   completer = completer,
-  helpPermission = helpPermission
+  helpPermission = helpPermission,
+  exceptionHandler = exceptionHandler,
+  cooldown = cooldown
 ) {
   performs(action)
 }
@@ -358,6 +415,8 @@ fun Instructor.sub(
  * @param extraInfo Whether extra information should be shown for this instructor when help is shown.
  * @param completer The completer to be used for this sub-instructor.
  * @param helpPermission Optional permission required to execute the help command. If null, no permission is required.
+ * @param exceptionHandler The exception handler to be used for this command. If null, [DefaultExceptionHandler] is used.
+ * @param cooldown The cooldown to be used for this command. If null, no cooldown is used.
  * @param action The performer action to be executed when this subcommand is called.
  * @return A [ChildrenInstructor] representing the created sub-instructor.
  */
@@ -371,6 +430,8 @@ fun Instructor.subAsync(
   extraInfo: Boolean = true,
   completer: Completer? = null,
   helpPermission: String? = null,
+  exceptionHandler: CommandExceptionHandler? = null,
+  cooldown: Duration? = null,
   action: suspend Context.() -> Unit,
 ): ChildrenInstructor = internalAppendChildren(
   name,
@@ -381,7 +442,9 @@ fun Instructor.subAsync(
   showHelp = showHelp,
   extraInfo = extraInfo,
   completer = completer,
-  helpPermission = helpPermission
+  helpPermission = helpPermission,
+  exceptionHandler = exceptionHandler,
+  cooldown = cooldown,
 ) {
   performsAsync(action)
 }

@@ -16,7 +16,7 @@ fun interface Executor {
    * @param other The other executor to merge with this one.
    * @return The merged executor.
    */
-  fun merge(other: Executor): Executor {
+  infix fun merge(other: Executor): Executor {
     return Executor {
       execute(it)
       other.execute(it)

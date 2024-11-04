@@ -27,6 +27,36 @@ interface Instructable {
   var completer: Completer
   
   /**
+   * The exception handler of this instructable.
+   *
+   * An [CommandExceptionHandler] object that defines the behavior of the instructable command exceptions.
+   */
+  var exceptionHandler: CommandExceptionHandler
+  
+  /**
+   * The cooldown of this instructable.
+   *
+   * Used to control the rate at which a command can be executed.
+   *
+   * Should be verified with [hasCooldown] before using to avoid errors.
+   */
+  var cooldown: CommandCooldown
+  
+  /**
+   * Checks if this instructable has a cooldown.
+   *
+   * @return True if the instructable has a cooldown, false otherwise.
+   */
+  val hasCooldown: Boolean
+  
+  /**
+   * The stats of this instructable.
+   *
+   * Used to track command usage statistics.
+   */
+  var stats: CommandStats
+  
+  /**
    * Returns the type of [Sender] that can perform this instructable.
    *
    * This property defines which sender type (e.g., player, console, or both) is allowed to execute

@@ -3,6 +3,11 @@
 package harmony.command
 
 /**
+ * Common interface for exceptions that can occur during the execution of an instructor command.
+ */
+interface InstructorException
+
+/**
  * Represents an error that occurs during the execution of an instructor command.
  *
  * This error can be triggered when a required argument is missing, when a validation fails,
@@ -11,7 +16,7 @@ package harmony.command
  * @constructor Initializes the error with a custom message.
  * @param message The detailed error message explaining the cause of the error.
  */
-class InstructorError(message: String) : Exception(message)
+class InstructorError(message: String) : Exception(message), InstructorException
 
 /**
  * Represents an exception that can be used to stop the execution of a command.
@@ -19,7 +24,15 @@ class InstructorError(message: String) : Exception(message)
  * This exception can be thrown to signal that the command should be immediately halted,
  * without necessarily indicating an error condition.
  */
-object InstructorStop : Exception()
+object InstructorStop : Exception(), InstructorException
+
+/**
+ * Represents an exception that can be used to signal an error condition in the command execution.
+ *
+ * This is only thrown when a exception is sended from a [CommandExceptionHandler].
+ * @param cause The exception that was thrown.
+ */
+class ExceptionHandlerError(cause: Throwable) : Exception("An exception was thrown from CommandExceptionHandler and was not handled", cause)
 
 /**
  * Throws an [InstructorError] with the specified [message].
