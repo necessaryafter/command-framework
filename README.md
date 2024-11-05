@@ -12,23 +12,9 @@ repositories {
 }
 
 dependencies {
-  implementation("com.github.networkharmony:command-framework:1.1.0")
+  implementation("com.github.networkharmony:command-framework:1.2.0")
 }
 ```
-
-## 1.1.0 Features:
-### News
-- Enhanced asynchronous command creation
-- Added support to tab completion
-- Added extra permission to help command
-
-### Break-changes
-- Splitted off the command executor into a separate interface
-- Renamed `Argumentable` to `Context`
-- Renamed some functions to be more consistent with their functionality
-
-### Fixes
-- Fixed (possible) NPE when accessing the help command
 
 ## Wiki:
 - [install](https://github.com/networkharmony/command-framework/wiki)
