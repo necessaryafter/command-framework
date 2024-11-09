@@ -4,7 +4,7 @@ import harmony.command.*
 import it.unimi.dsi.fastutil.objects.*
 import org.bukkit.*
 import org.bukkit.command.*
-import org.bukkit.craftbukkit.v1_8_R3.*
+import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.util.*
 
 val commandMap: SimpleCommandMap get() = (Bukkit.getServer() as CraftServer).commandMap
