@@ -1,5 +1,7 @@
 plugins {
   kotlin("jvm") version "2.0.21"
+  id("io.papermc.paperweight.userdev") version "1.7.4"
+
   id("java")
   id("maven-publish")
 }
@@ -14,14 +16,14 @@ repositories {
 }
 
 dependencies {
-  //compileOnly("org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT") - jitpack not support local repositories...
-  compileOnly(fileTree("libs"))
+  paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT") // Add readable NMS
+
   compileOnly("it.unimi.dsi:fastutil:8.5.13")
   compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 }
 
 kotlin {
-  jvmToolchain(8)
+  jvmToolchain(21)
 }
 
 publishing {
