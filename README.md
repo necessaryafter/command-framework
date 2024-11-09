@@ -18,7 +18,7 @@ dependencies {
 
 ## Wiki:
 - [install](https://github.com/networkharmony/command-framework/wiki)
-- [core](https://github.com/networkharmony/command-framework/wiki/Understanding-the-main-entries-of-the-framework)
+- [core](https://github.com/networkharmony/command-framework/wiki/The-main-entry)
 - [arguments](https://github.com/networkharmony/command-framework/wiki/Arguments)
 - [executors](https://github.com/networkharmony/command-framework/wiki/Executors)
 - [completers](https://github.com/networkharmony/command-framework/wiki/Tab-completion)
