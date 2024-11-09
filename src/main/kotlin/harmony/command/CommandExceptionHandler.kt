@@ -43,7 +43,7 @@ object DefaultExceptionHandler : CommandExceptionHandler {
   override fun handle(exception: Exception, command: Instructor, context: Context) {
     when (exception) {
       is InstructorStop -> return
-      is InstructorError -> context.sender.sendMessage(exception.message)
+      is InstructorError -> exception.message?.let { context.sender.sendMessage(it) }
       else -> {
         val sender = context.sender
         if (sender.isOp) {
@@ -68,7 +68,7 @@ object IgnoreExceptionHandler : CommandExceptionHandler {
   override fun handle(exception: Exception, command: Instructor, context: Context) {
     // only handle InstructorErrors
     if (exception is InstructorError) {
-      context.sender.sendMessage(exception.message)
+      exception.message?.let { context.sender.sendMessage(it) }
     }
   }
 }

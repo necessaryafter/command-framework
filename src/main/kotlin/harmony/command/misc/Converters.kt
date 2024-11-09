@@ -1,9 +1,11 @@
 package harmony.command.misc
 
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
 import org.bukkit.*
+import org.bukkit.block.data.BlockData
 import org.bukkit.enchantments.*
 import org.bukkit.entity.*
-import org.bukkit.material.*
 
 /**
  * Converts a string representation of a sound name to a Sound instance.
@@ -23,21 +25,26 @@ fun String.toSound(): Sound? {
 fun String.toEntityType(): EntityType? {
   return runCatching {
     EntityType.valueOf(uppercase())
-  }.recoverCatching {
-    EntityType.fromId(toInt())
   }.getOrNull()
 }
 
 /**
- * Converts a string representation of a material and optional data to a MaterialData instance.
+ * Converts a string representation of a material and optional data to a BlockData instance.
  *
- * @return The MaterialData instance created from the string, or null if the material or data is invalid.
+ * @return The BlockData instance created from the string, or null if the material or data is invalid.
  */
-fun String.toMaterialData(): MaterialData? {
+fun String.toBlockData(): BlockData? {
   val split = split(':', limit = 2)
   val material = Material.matchMaterial(split[0]) ?: return null
-  val data = split[1].toByteOrNull() ?: return null
-  return MaterialData(material, data)
+
+  return if (split.isNotEmpty()) {
+    try {
+      material.createBlockData(split[1])
+    } catch (_: IllegalArgumentException) {
+      null
+    }
+  } else
+    material.createBlockData()
 }
 
 /**
@@ -62,9 +69,11 @@ fun String.toGamemode(): GameMode? {
  */
 fun String.toEnchantment(): Enchantment? {
   return runCatching {
-    Enchantment.getByName(this)
-  }.recoverCatching {
-    Enchantment.getById(toInt())
+    val registry = RegistryAccess
+      .registryAccess()
+      .getRegistry(RegistryKey.ENCHANTMENT)
+
+    registry.get(NamespacedKey.minecraft(this))
   }.getOrNull()
 }
 

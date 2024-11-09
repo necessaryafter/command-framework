@@ -185,7 +185,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     }
     
     if (!testPermissionSilent(sender)) {
-      sender.sendMessage(permissionMessage)
+      sender.sendMessage("§cVocê não tem permissão para executar este comando.")
       return false
     }
     
@@ -195,14 +195,14 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     }
     
     if (!this::executor.isInitialized || isHelpArg(firstArg) && childrens.isNotEmpty()) {
-      if (helpPermission.isNullOrBlank() || sender.hasPermission(helpPermission)) {
+      if (helpPermission.isNullOrBlank() || sender.hasPermission(helpPermission!!)) {
         if (sender is Player) {
           sendHelpToPlayer(sender)
         } else {
           sendHelpToConsole(sender)
         }
       } else {
-        sender.sendMessage(permissionMessage)
+        sender.sendMessage("§cVocê não tem permissão para executar este comando.")
       }
       return false
     }
@@ -300,7 +300,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
    * @return `true` if the target has the required permission, `false` otherwise.
    */
   override fun testPermissionSilent(target: CommandSender): Boolean {
-    return if (permission.isNullOrBlank()) true else target.hasPermission(permission)
+    return if (permission.isNullOrBlank()) true else target.hasPermission(permission!!)
   }
   
   /**
@@ -325,7 +325,7 @@ open class Instructor(name: String) : Command(name.trim().lowercase()), Instruct
     childrens.forEachIndexed { index, child ->
       if (child.showInHelp) {
         if (child.extraInfo) {
-          player.spigot().sendMessage(child.getInformationalHelp(index == childrens.size - 1))
+          player.sendMessage(child.getInformationalHelp(index == childrens.size - 1))
         } else {
           player.sendMessage(" §b§l${if (index == childrens.size - 1) "┗" else "┃"} §f/${child.fullUsage}")
         }

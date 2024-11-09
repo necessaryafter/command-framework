@@ -3,10 +3,10 @@ package harmony.command
 import harmony.command.misc.*
 import net.md_5.bungee.api.chat.*
 import org.bukkit.*
+import org.bukkit.block.data.BlockData
 import org.bukkit.command.*
 import org.bukkit.enchantments.*
 import org.bukkit.entity.*
-import org.bukkit.material.*
 import kotlin.reflect.*
 
 /**
@@ -108,7 +108,7 @@ interface Context : Iterable<String> {
   fun optionalString(index: Int = currentIndex, permission: String? = null): String? {
     val arg = arguments.getOrNull(index)
     if (arg != null && permission != null && !sender.hasPermission(permission)) {
-      fail(instructor.permissionMessage)
+      fail("§cVocê não tem permissão para executar este comando.")
     }
     currentIndex++
     return arg
@@ -1229,80 +1229,80 @@ fun Context.material(
 }
 
 /**
- * Retrieves a nullable `MaterialData` object by the provided index.
+ * Retrieves a nullable `BlockData` object by the provided index.
  * If the argument is missing, it returns null.
  *
  * This function attempts to retrieve a string from the arguments at the specified index
- * and converts it to a `MaterialData` object. If the string does not correspond to a valid material data,
+ * and converts it to a `BlockData` object. If the string does not correspond to a valid block data,
  * null is returned.
  *
  * ## Behavior
  * - If the specified index does not correspond to a valid string, it returns null.
- * - If the string does not correspond to a valid material data, it also returns null.
+ * - If the string does not correspond to a valid block data, it also returns null.
  *
- * @param index The index to retrieve the material data string from. Default is `currentIndex`.
+ * @param index The index to retrieve the block data string from. Default is `currentIndex`.
  * @param permission Optional permission required to access the argument.
- * @return The corresponding `MaterialData` object if found, or null if the index is invalid or the material data does not exist.
+ * @return The corresponding `BlockData` object if found, or null if the index is invalid or the block data does not exist.
  */
-fun Context.nullableMaterialData(
+fun Context.nullableBlockData(
   index: Int = currentIndex,
   permission: String? = null,
-): MaterialData? {
-  return optionalString(index, permission)?.toMaterialData()
+): BlockData? {
+  return optionalString(index, permission)?.toBlockData()
 }
 
 /**
- * Retrieves a nullable `MaterialData` object by the provided index.
+ * Retrieves a nullable `BlockData` object by the provided index.
  * If the argument is missing, it returns null.
  *
  * This function attempts to retrieve a string from the arguments at the specified index
- * and converts it to a `MaterialData` object. If the string does not correspond to a valid material data,
+ * and converts it to a `BlockData` object. If the string does not correspond to a valid block data,
  * it fails with the specified error message.
  *
  * ## Behavior
  * - If the specified index does not correspond to a valid string, it returns null.
- * - If the string does not correspond to a valid material data, it fails with the provided found message.
+ * - If the string does not correspond to a valid block data, it fails with the provided found message.
  *
- * @param index The index to retrieve the material data string from. Default is `currentIndex`.
- * @param found The error message if the material data is not found. Default is "§cMaterial Data não encontrado."
+ * @param index The index to retrieve the block data string from. Default is `currentIndex`.
+ * @param found The error message if the block data is not found. Default is "§cBlock Data não encontrado."
  * @param permission Optional permission required to access the argument.
- * @return The corresponding `MaterialData` object if found, or null if the index is invalid or the material data does not exist.
+ * @return The corresponding `BlockData` object if found, or null if the index is invalid or the block data does not exist.
  */
-fun Context.optionalMaterialData(
+fun Context.optionalBlockData(
   index: Int = currentIndex,
-  found: String = "§cMaterial Data não encontrado.",
+  found: String = "§cBlock Data não encontrado.",
   permission: String? = null,
-): MaterialData? {
+): BlockData? {
   val string = optionalString(index, permission) ?: return null
-  return string.toMaterialData() ?: fail(found)
+  return string.toBlockData() ?: fail(found)
 }
 
 /**
- * Retrieves a `MaterialData` object by the provided index.
+ * Retrieves a `BlockData` object by the provided index.
  * If the argument is missing or invalid, it fails with the specified message.
  *
  * This function attempts to retrieve a string from the arguments at the specified index
- * and converts it to a `MaterialData` object. If the string does not correspond to a valid material data,
+ * and converts it to a `BlockData` object. If the string does not correspond to a valid block data,
  * it fails with the appropriate error message.
  *
  * ## Behavior
  * - If the specified index does not correspond to a valid string, it fails with the provided empty message.
- * - If the string does not correspond to a valid material data, it fails with the provided found message.
+ * - If the string does not correspond to a valid block data, it fails with the provided found message.
  *
- * @param index The index to retrieve the material data string from. Default is `currentIndex`.
+ * @param index The index to retrieve the block data string from. Default is `currentIndex`.
  * @param empty The error message if the argument is missing. Default is `usage`.
- * @param found The error message if the material data is not found. Default is "§cMaterial Data não encontrado."
+ * @param found The error message if the block data is not found. Default is "§cBlock Data não encontrado."
  * @param permission Optional permission required to access the argument.
- * @return The corresponding `MaterialData` object associated with the provided name.
+ * @return The corresponding `BlockData` object associated with the provided name.
  */
-fun Context.materialData(
+fun Context.blockData(
   index: Int = currentIndex,
   empty: String = usage,
-  found: String = "§cMaterial Data não encontrado.",
+  found: String = "§cBlock Data não encontrado.",
   permission: String? = null,
-): MaterialData {
+): BlockData {
   val string = optionalString(index, permission) ?: fail(empty)
-  return string.toMaterialData() ?: fail(found)
+  return string.toBlockData() ?: fail(found)
 }
 
 /**

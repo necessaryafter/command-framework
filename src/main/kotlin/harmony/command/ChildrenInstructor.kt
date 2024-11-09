@@ -1,5 +1,9 @@
 package harmony.command
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.event.HoverEvent
 import net.md_5.bungee.api.chat.*
 
 /**
@@ -72,25 +76,23 @@ open class ChildrenInstructor(val parent: Instructor, name: String) : Instructor
    * @return The [TextComponent] representation of the command's help information.
    */
   open fun getInformationalHelp(isEnd: Boolean): TextComponent {
-    return TextComponent(" §b§l${if (isEnd) "┗" else "┃"} §f${fullUsage}").apply {
-      clickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/${fullyName}")
-      hoverEvent = HoverEvent(
-        HoverEvent.Action.SHOW_TEXT,
-        arrayOf(
-          TextComponent(
-            """
-            §fAliases: §7${if (aliases.isEmpty()) "Nenhum" else aliases.joinToString(", ", limit = 5)}
-            §fPermissão: §7${permission ?: "Nenhuma"}
-            §fAplicado para: §7${sender.display}
-            §fUso: §7${usageArguments}
-            §fMáximo de argumentos: §7${if (maxArgs < 0) "∞" else maxArgs}
-            §fSub-comandos: §7${childrens.size}
-            
-            §bClique para sugerir.
-            """.trimIndent()
-          )
+    val text = if (isEnd) "┗" else "┃"
+
+    return Component.text(" §b§l$text §f${fullUsage}")
+      .clickEvent(ClickEvent.suggestCommand("/${fullyName}"))
+      .hoverEvent(HoverEvent.showText(
+        Component.text(
+          """
+                §fAliases: §7${if (aliases.isEmpty()) "Nenhum" else aliases.joinToString(", ", limit = 5)}
+                §fPermissão: §7${permission ?: "Nenhuma"}
+                §fAplicado para: §7${sender.display}
+                §fUso: §7${usageArguments}
+                §fMáximo de argumentos: §7${if (maxArgs < 0) "∞" else maxArgs}
+                §fSub-comandos: §7${childrens.size}
+                
+                §bClique para sugerir.
+                """.trimIndent()
         )
-      )
-    }
+      ))
   }
 }
