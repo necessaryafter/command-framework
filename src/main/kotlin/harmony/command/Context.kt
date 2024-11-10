@@ -1,13 +1,16 @@
 package harmony.command
 
 import harmony.command.misc.*
-import net.md_5.bungee.api.chat.*
+import net.kyori.adventure.text.Component
 import org.bukkit.*
 import org.bukkit.block.data.BlockData
-import org.bukkit.command.*
-import org.bukkit.enchantments.*
-import org.bukkit.entity.*
-import kotlin.reflect.*
+import org.bukkit.command.CommandSender
+import org.bukkit.command.ConsoleCommandSender
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.typeOf
 
 /**
  * Represents an object that holds an array of [String] arguments.
@@ -750,7 +753,7 @@ fun Context.nullablePlayer(
   index: Int = currentIndex,
   permission: String? = null,
 ): Player? {
-  return optionalString(index, permission)?.let { Bukkit.getPlayer(it) }
+  return optionalString(index, permission)?.let { Bukkit.getPlayerExact(it) }
 }
 
 /**
@@ -776,7 +779,7 @@ fun Context.optionalPlayer(
   permission: String? = null,
 ): Player? {
   val name = optionalString(index, permission) ?: return null
-  return Bukkit.getPlayer(name) ?: fail(found)
+  return Bukkit.getPlayerExact(name) ?: fail(found) // Improve performance using getPlayerExact
 }
 
 /**
@@ -805,7 +808,7 @@ fun Context.player(
   permission: String? = null,
 ): Player {
   val name = optionalString(index, permission) ?: fail(empty)
-  return Bukkit.getPlayer(name) ?: fail(found)
+  return Bukkit.getPlayerExact(name) ?: fail(found)
 }
 
 /**
@@ -1554,30 +1557,30 @@ fun Context.list(
 /**
  * Validates a boolean condition and fails with the specified message if the condition is false.
  *
- * This function checks the provided `valide` parameter. If it is true, the function returns true.
+ * This function checks the provided `valid` parameter. If it is true, the function returns true.
  * If it is false, it fails with the provided message.
  *
  * ## Parameters
- * - `valide`: The boolean condition to validate.
+ * - `valid`: The boolean condition to validate.
  * - `message`: The message to display if the validation fails. Default is `usage`.
  *
  * @return True if the validation succeeds; otherwise, fails with the provided message.
  */
-fun Context.validate(valide: Boolean, message: String = usage): Boolean = if (valide) true else fail(message)
+fun Context.validate(valid: Boolean, message: String = usage): Boolean = if (valid) true else fail(message)
 
 /**
  * Validates a boolean condition and fails with the specified message if the condition is true.
  *
- * This function checks the provided `valide` parameter. If it is false, the function returns true.
+ * This function checks the provided `valid` parameter. If it is false, the function returns true.
  * If it is true, it fails with the provided message.
  *
  * ## Parameters
- * - `valide`: The boolean condition to validate.
+ * - `valid`: The boolean condition to validate.
  * - `message`: The message to display if the validation fails. Default is `usage`.
  *
  * @return True if the validation succeeds; otherwise, fails with the provided message.
  */
-fun Context.validateNot(valide: Boolean, message: String = usage): Boolean = if (!valide) true else fail(message)
+fun Context.validateNot(valid: Boolean, message: String = usage): Boolean = if (!valid) true else fail(message)
 
 /**
  * Joins all arguments into a single string, separated by spaces.
@@ -1742,8 +1745,8 @@ fun Context.msg(message: String) {
  *
  * @param message The message to send as a `TextComponent`.
  */
-fun Context.msg(message: TextComponent) {
-  if (isPlayer) player.spigot().sendMessage(message)
+fun Context.msg(message: Component) {
+  sender.sendMessage(message)
 }
 
 /**
